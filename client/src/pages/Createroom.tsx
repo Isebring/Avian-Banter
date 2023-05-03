@@ -1,5 +1,5 @@
-function Createroom() {
-  return <h1>Create a room</h1>;
+function CreateRoom() {
+  return <h1>Create a new room</h1>;
 }
 
-export default Createroom;
+export default CreateRoom;

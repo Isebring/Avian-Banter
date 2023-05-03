@@ -9,16 +9,16 @@ import {
 } from 'react-router-dom';
 import App from './App';
 import './index.css';
-import Createroom from './pages/Createroom';
-import Joinroom from './pages/Joinroom';
-import Landingpage from './pages/Landingpage';
+import CreateRoom from './pages/CreateRoom';
+import JoinRoom from './pages/JoinRoom';
+import LandingPage from './pages/LandingPage';
 
 const router = createBrowserRouter(
   createRoutesFromElements(
     <Route path="/" element={<App />}>
-      <Route index element={<Landingpage />} />
-      <Route path="/joinroom" element={<Joinroom />} />
-      <Route path="/createroom" element={<Createroom />} />
+      <Route index element={<LandingPage />} />
+      <Route path="/joinroom" element={<JoinRoom />} />
+      <Route path="/createroom" element={<CreateRoom />} />
     </Route>
   )
 );

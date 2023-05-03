@@ -1,5 +1,5 @@
-function Landingpage() {
-  return <h1>Welcome to Avian Banter</h1>;
+function LandingPage() {
+  return <h1>Welcome to Avian Banter!</h1>;
 }
 
-export default Landingpage;
+export default LandingPage;
