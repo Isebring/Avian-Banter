@@ -1,7 +1,11 @@
+import { Outlet } from 'react-router';
+
 function App() {
   return (
     <>
-      <h1>Avian Banter time</h1>
+      <main>
+        <Outlet />
+      </main>
     </>
   );
 }
