@@ -2,6 +2,7 @@ import {
   Avatar,
   Box,
   Button,
+  Container,
   Flex,
   Group,
   Input,
@@ -15,6 +16,7 @@ import { IconCircleCheck, IconUser } from '@tabler/icons-react';
 
 function LandingPage() {
   return (
+    <Container fluid>
     <Flex align="center" justify="space-between">
       <Box  sx={{ flex: 1, marginLeft: 'auto' }}>
         <Title pl="lg">
@@ -49,7 +51,7 @@ function LandingPage() {
         </Group>
       </Box>
        <MediaQuery
-      query="(max-width: 700px)"
+      query="(max-width: 800px)"
       styles={{ display: 'none' }}
     >
       <Box sx={{ flex: 1, marginLeft: 'auto' }}>
@@ -61,6 +63,7 @@ function LandingPage() {
       </Box>
       </MediaQuery> 
     </Flex>
+    </Container>
   );
 }
 
