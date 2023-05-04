@@ -12,7 +12,12 @@ if (!process.env.MONGO_URL) {
 const DB = 'mydb';
 const COLLECTION = 'socket.io-adapter-events';
 
-const io = new Server();
+const io = new Server({
+  cors: {
+    origin: 'http://localhost:5173',
+    methods: ['GET', 'POST'],
+  },
+});
 
 const mongoClient = new MongoClient(process.env.MONGO_URL, {});
 
@@ -31,6 +36,12 @@ const main = async () => {
       addCreatedAtField: true,
     })
   );
+
+  io.on('connection', (socket) => {
+    console.log(`Client connected: ${socket.id}`);
+    socket.emit('message', 'Welcome to Avian Banter!');
+  });
+
   io.listen(3000);
   console.log('Connected and listening to port 3000');
 };
