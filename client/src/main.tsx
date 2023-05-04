@@ -8,6 +8,7 @@ import {
   RouterProvider,
 } from 'react-router-dom';
 import App from './App';
+import SocketProvider from './context/SocketContext';
 import CreateRoom from './pages/Createroom';
 import JoinRoom from './pages/Joinroom';
 import LandingPage from './pages/Landingpage';
@@ -25,7 +26,9 @@ const router = createBrowserRouter(
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
     <MantineProvider withGlobalStyles withNormalizeCSS>
-      <RouterProvider router={router} />
+      <SocketProvider>
+        <RouterProvider router={router} />
+      </SocketProvider>
     </MantineProvider>
   </React.StrictMode>
 );

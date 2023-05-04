@@ -13,10 +13,27 @@ import {
   Tooltip,
 } from '@mantine/core';
 import { IconCircleCheck, IconUser } from '@tabler/icons-react';
-import { useEffect } from 'react';
-import socket from '../socket';
+import { useEffect, useState } from 'react';
+// import socket from '../socket';
+import { Link } from 'react-router-dom';
+import { useSocket } from '../context/SocketContext';
 
 function LandingPage() {
+  const { socket } = useSocket();
+  const [username, setUsername] = useState('');
+
+  function StoreUsername() {
+    if (username) {
+      socket.emit('storeUsername', username, (success: boolean) => {
+        if (success) {
+          console.log('Username stored successfully');
+        } else {
+          console.error('Error storing the username');
+        }
+      });
+    }
+  }
+
   useEffect(() => {
     socket.on('message', (msg: string) => {
       console.log(`Message from server: ${msg}`);
@@ -25,7 +42,7 @@ function LandingPage() {
     return () => {
       socket.off('message');
     };
-  }, []);
+  }, [socket]);
 
   return (
     <Container fluid>
@@ -45,6 +62,8 @@ function LandingPage() {
               mt="md"
               icon={<IconUser size="1rem" />}
               placeholder="Your username..."
+              value={username}
+              onChange={(event) => setUsername(event.currentTarget.value)}
               rightSection={
                 <Tooltip
                   label="Username available"
@@ -62,8 +81,16 @@ function LandingPage() {
             />
           </Stack>
           <Group spacing="sm" position="center" mt="xl">
-            <Button variant="filled">Create a room</Button>
-            <Button variant="outline">Join a room</Button>
+            <Link to="/createroom">
+              <Button variant="filled" onClick={StoreUsername}>
+                Create a room
+              </Button>
+            </Link>
+            <Link to="/joinroom">
+              <Button variant="outline" onClick={StoreUsername}>
+                Join a room
+              </Button>
+            </Link>
           </Group>
         </Box>
         <MediaQuery query="(max-width: 800px)" styles={{ display: 'none' }}>
