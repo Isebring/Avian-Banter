@@ -8,7 +8,6 @@ import {
   RouterProvider,
 } from 'react-router-dom';
 import App from './App';
-import './index.css';
 import CreateRoom from './pages/CreateRoom';
 import JoinRoom from './pages/JoinRoom';
 import LandingPage from './pages/LandingPage';
