@@ -9,8 +9,8 @@ import {
 } from 'react-router-dom';
 import App from './App';
 import SocketProvider from './context/SocketContext';
-import CreateRoom from './pages/Createroom';
-import JoinRoom from './pages/Joinroom';
+import CreateRoom from './pages/CreateRoom';
+import JoinRoom from './pages/JoinRoom';
 import LandingPage from './pages/Landingpage';
 
 const router = createBrowserRouter(
