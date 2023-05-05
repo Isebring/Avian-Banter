@@ -6,6 +6,9 @@ function JoinRoom() {
     <Container>
       <Title>Active Rooms:</Title>
       <RoomCard />
+      <RoomCard />
+      <RoomCard />
+      <RoomCard />
     </Container>
   );
 }

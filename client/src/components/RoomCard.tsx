@@ -1,5 +1,13 @@
+import { Button, Card, Text, Title } from '@mantine/core';
+
 function RoomCard() {
-  return <h1>RoomCard</h1>;
+  return (
+    <Card shadow="sm" radius="md" padding="lg" withBorder>
+      <Title>RoomName</Title>
+      <Text>Users</Text>
+      <Button>Join</Button>
+    </Card>
+  );
 }
 
 export default RoomCard;
