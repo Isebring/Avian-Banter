@@ -1,10 +1,11 @@
 import { Button, Card, Text, Title } from '@mantine/core';
+import { IconMessageChatbot } from '@tabler/icons-react';
 
 function RoomCard() {
   return (
     <Card
       shadow="sm"
-      radius="md"
+      radius="lg"
       padding="lg"
       m="md"
       withBorder
@@ -15,9 +16,11 @@ function RoomCard() {
         justifyContent: 'spaceBetween',
       }}
     >
-      <Title align="center">RoomName</Title>
+      <Title align="center" order={3}>
+        RoomName
+      </Title>
       <Text m="md">Users</Text>
-      <Button>Join</Button>
+      <Button leftIcon={<IconMessageChatbot />}>Join Room</Button>
     </Card>
   );
 }
