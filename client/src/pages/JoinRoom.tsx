@@ -1,8 +1,12 @@
+import { Container, Title } from '@mantine/core';
+import RoomCard from '../components/RoomCard';
+
 function JoinRoom() {
   return (
-    <div>
+    <Container>
+      <Title>Active Rooms:</Title>
       <RoomCard />
-    </div>
+    </Container>
   );
 }
 
