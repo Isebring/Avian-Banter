@@ -1,17 +1,18 @@
 import {
-    Box,
-    Burger,
-    Divider,
-    Drawer,
-    Group,
-    Header,
-    MediaQuery,
-    ScrollArea,
-    createStyles,
-    rem,
+  Box,
+  Burger,
+  Button,
+  Divider,
+  Drawer,
+  Group,
+  Header,
+  MediaQuery,
+  ScrollArea,
+  createStyles,
+  rem,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { IconInfoCircle } from '@tabler/icons-react';
+import { IconInfoCircle, IconMessageCircle } from '@tabler/icons-react';
 import { Link } from 'react-router-dom';
 
 const useStyles = createStyles((theme) => ({
@@ -72,6 +73,10 @@ const useStyles = createStyles((theme) => ({
 export function Navigationbar() {
   const [drawerOpened, { toggle: toggleDrawer, close: closeDrawer }] =
     useDisclosure(false);
+  const [
+    messagesDrawerOpened,
+    { toggle: toggleMessagesDrawer, close: closeMessagesDrawer },
+  ] = useDisclosure(false);
   //   const [linksOpened, { toggle: toggleLinks }] = useDisclosure(false);
   const { classes, theme } = useStyles();
 
@@ -81,6 +86,7 @@ export function Navigationbar() {
       behavior: 'smooth',
     });
     closeDrawer();
+    closeMessagesDrawer();
   }
 
   return (
@@ -88,10 +94,7 @@ export function Navigationbar() {
       <Header height={65} px="md">
         <Group position="apart" sx={{ height: '100%' }}>
           <Link onClick={scrollToTop} to="/">
-            <MediaQuery
-              query="(max-width: 500px)"
-              styles={{ width: '190px' }}
-            >
+            <MediaQuery query="(max-width: 500px)" styles={{ width: '190px' }}>
               <img
                 src="/avian-banter-logo.svg"
                 alt="AvianBanter logo"
@@ -113,6 +116,18 @@ export function Navigationbar() {
               />
               About
             </Link>
+            <Button
+            className={classes.link}
+            variant="hidden"
+              onClick={toggleMessagesDrawer}
+            >
+              <IconMessageCircle
+                style={{ marginRight: '0.2rem' }}
+                size="1.2rem"
+                stroke={0.8}
+              />
+              Messages
+            </Button>
           </Group>
 
           <Group className={classes.hiddenMobile}>
@@ -168,6 +183,17 @@ export function Navigationbar() {
 
           <Group position="center" grow pb="xl" px="md"></Group>
         </ScrollArea>
+      </Drawer>
+      <Drawer
+        opened={messagesDrawerOpened}
+        onClose={closeMessagesDrawer}
+        position="right"
+        size="40%"
+        padding="md"
+        title="Messages"
+        zIndex={1000000}
+      >
+        {/* Add your messages-related content here */}
       </Drawer>
     </Box>
   );
