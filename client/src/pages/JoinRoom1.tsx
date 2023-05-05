@@ -1,9 +1,5 @@
 function JoinRoom() {
-  return (
-    <div>
-      <RoomCard />
-    </div>
-  );
+  return <h1>Join a room!</h1>;
 }
 
 export default JoinRoom;
