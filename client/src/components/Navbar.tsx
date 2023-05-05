@@ -117,8 +117,8 @@ export function Navigationbar() {
               About
             </Link>
             <Button
-            className={classes.link}
-            variant="hidden"
+              className={classes.link}
+              variant="hidden"
               onClick={toggleMessagesDrawer}
             >
               <IconMessageCircle
@@ -175,6 +175,22 @@ export function Navigationbar() {
             />
             About
           </a>
+          <Divider
+            my="lg"
+            color={theme.colorScheme === 'dark' ? 'dark.5' : 'gray.1'}
+          />
+          <Button
+            className={classes.link}
+            variant="hidden"
+            onClick={toggleMessagesDrawer}
+          >
+            <IconMessageCircle
+              style={{ marginRight: '0.2rem' }}
+              size="1.2rem"
+              stroke={0.8}
+            />
+            Messages
+          </Button>
 
           <Divider
             my="lg"
