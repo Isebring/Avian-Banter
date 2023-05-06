@@ -48,11 +48,12 @@ const main = async () => {
           callback(false);
           return;
         }
+        socket.data.username = username;
 
-        const usersCollection = mongoClient.db(DB).collection('users');
-        await usersCollection.insertOne({ username });
-        console.log(`Username stored: ${username}`);
-        callback(true);
+        // const usersCollection = mongoClient.db(DB).collection('users');
+        // await usersCollection.insertOne({ username });
+        // console.log(`Username stored: ${username}`);
+        // callback(true);
       }
     );
 

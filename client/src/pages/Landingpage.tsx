@@ -47,9 +47,9 @@ function LandingPage() {
   return (
     <Container fluid>
       <Flex align="center" justify="space-between">
-        <Box sx={{ flex: 1, marginLeft: 'auto' }}>
+        <Box sx={{ flex: 1 }}>
           <Title pl="lg">
-            AvianBanter is a Chat Application built for everyone with a beak
+            Avian Banter is a Chat Application built for everyone with a beak
           </Title>
           <Text pl="lg" size="lg" color="gray">
             Here you can create or join chat rooms. You can also send private
@@ -94,7 +94,7 @@ function LandingPage() {
           </Group>
         </Box>
         <MediaQuery query="(max-width: 800px)" styles={{ display: 'none' }}>
-          <Box sx={{ flex: 1, marginLeft: 'auto' }}>
+          <Box sx={{ flex: 1}}>
             <img
               src="/avian-phone.png"
               alt="Bird browsing a smartphone"
