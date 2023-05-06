@@ -57,6 +57,24 @@ const main = async () => {
       }
     );
 
+    socket.on('createRoom', (room: string) => {
+      if (!room || !socket.data.username) return;
+      console.log(`Room created: ${room}`);
+      socket.join(room);
+      console.log(`${socket.data.username} joined room ${room}`);
+      socket.emit('message', `You have joined the room.`);
+      socket
+        .to(room)
+        .emit('message', `User ${socket.data.username} has joined the room.`);
+    });
+
+    socket.on('sendMessage', (message: string, room: string) => {
+      if (!message || !socket.data.username) return;
+      const formattedMessage = `${socket.data.username}: ${message}`;
+      socket.to(room).emit('message', formattedMessage);
+      socket.emit('message', formattedMessage);
+    });
+
     socket.on('joinRoom', (room) => {
       socket.join(room);
       console.log(`${socket.id} joined room ${room}`);
