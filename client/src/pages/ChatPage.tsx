@@ -1,4 +1,6 @@
-import { Box, Button, Input } from '@mantine/core';
+import { Button, Container, Flex, Group, Paper, Textarea } from '@mantine/core';
+import { IconMoodHappy } from '@tabler/icons-react';
+import EmojiPicker from 'emoji-picker-react';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useSocket } from '../context/SocketContext';
@@ -8,6 +10,7 @@ function ChatPage() {
   const { socket } = useSocket();
   const [messages, setMessages] = useState<string[]>([]);
   const [inputMessage, setInputMessage] = useState('');
+  const [showPicker, setShowPicker] = useState(false);
 
   useEffect(() => {
     socket.on('message', (message: string) => {
@@ -27,23 +30,42 @@ function ChatPage() {
     }
   };
 
+  const onEmojiClick = (emojiObject: any) => {
+    setInputMessage((prevInput) => prevInput + emojiObject.emoji);
+  };
+  
+
   return (
-    <div>
+    <Flex justify="center" align="center">
+    <Container size="xl">
       <h1>Welcome to room {room}</h1>
       {messages.map((message, index) => (
         <p key={index}>{message}</p>
       ))}
       <form onSubmit={sendMessage}>
-        <Box display="flex">
-          <Input
+          <Paper shadow="md">
+          <Textarea
             value={inputMessage}
             onChange={(event) => setInputMessage(event.currentTarget.value)}
             placeholder="Type a message..."
           />
-          <Button type="submit">Send</Button>
-        </Box>
+            <Group sx={{display: 'flex', justifyContent: 'space-between'}}>
+          <Button
+            variant="hidden"
+            onClick={() => setShowPicker(!showPicker)}
+            style={{ marginLeft: '0.1rem' }}
+          >
+            <IconMoodHappy stroke={0.7} />
+          </Button>
+          {showPicker ? <EmojiPicker emojiStyle='native' onEmojiClick={onEmojiClick} /> : null}
+          <Button size="xs" type="submit" style={{ marginRight: '0.5rem' }}>
+            Send
+          </Button>
+          </Group>
+          </Paper>
       </form>
-    </div>
+    </Container>
+    </Flex>
   );
 }
 
