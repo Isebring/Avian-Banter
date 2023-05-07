@@ -5,23 +5,50 @@ import {
   useEffect,
   useState,
 } from 'react';
-import { Socket, io } from 'socket.io-client';
-import {
-  ClientToServerEvents,
-  ServerToClientEvents,
-} from '../../../server/communication';
+import { io } from 'socket.io-client';
 
 interface ContextValues {
-  socket: Socket;
+  storeUsername: (username: string) => void;
+  sendMessage: (room: string, message: string) => void;
+  createRoom: (title: string) => void;
+  messages: string[];
 }
+const socket = io();
 
 const SocketContext = createContext<ContextValues>(null as any);
 export const useSocket = () => useContext(SocketContext);
 
 function SocketProvider({ children }: PropsWithChildren) {
-  const [socket] = useState<Socket<ServerToClientEvents, ClientToServerEvents>>(
-    io()
-  );
+  const [messages, setMessages] = useState<string[]>([]);
+
+  const storeUsername = (username: string) => {
+    if (username) {
+      socket.emit('storeUsername', username);
+    }
+  };
+
+  const createRoom = (title: string) => {
+    if (title) {
+      socket.emit('createRoom', title);
+    }
+  };
+
+  const sendMessage = (room: string, message: string) => {
+    if (!room) throw Error("Can't send message without a room");
+    socket.emit('message', message, room);
+  };
+
+  useEffect(() => {
+    const onMessage = (message: string) => {
+      setMessages((prevMessages) => [...prevMessages, message]);
+    };
+
+    socket.on('message', onMessage);
+
+    return () => {
+      socket.off('message', onMessage);
+    };
+  }, [socket]);
 
   useEffect(() => {
     function connect() {
@@ -48,7 +75,9 @@ function SocketProvider({ children }: PropsWithChildren) {
   }, [socket]);
 
   return (
-    <SocketContext.Provider value={{ socket }}>
+    <SocketContext.Provider
+      value={{ storeUsername, sendMessage, messages, createRoom }}
+    >
       {children}
     </SocketContext.Provider>
   );
