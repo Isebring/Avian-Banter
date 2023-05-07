@@ -2,6 +2,12 @@ import { createAdapter } from '@socket.io/mongo-adapter';
 import dotenv from 'dotenv';
 import { MongoClient } from 'mongodb';
 import { Server } from 'socket.io';
+import {
+  ClientToServerEvents,
+  InterServerEvents,
+  ServerToClientEvents,
+  SocketData,
+} from './communication';
 
 dotenv.config();
 
@@ -12,7 +18,12 @@ if (!process.env.MONGO_URL) {
 const DB = 'mydb';
 const COLLECTION = 'socket.io-adapter-events';
 
-const io = new Server({
+const io = new Server<
+  ClientToServerEvents,
+  ServerToClientEvents,
+  InterServerEvents,
+  SocketData
+>({
   cors: {
     origin: 'http://localhost:5173',
     methods: ['GET', 'POST'],
