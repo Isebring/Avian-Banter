@@ -5,13 +5,13 @@ import { useNavigate } from 'react-router-dom';
 import { useSocket } from '../context/SocketContext';
 
 function CreateRoomCard() {
-  const { socket } = useSocket();
+  const { createRoom } = useSocket();
   const [title, setTitle] = useState('');
   const navigate = useNavigate();
 
-  const CreateRoom = () => {
+  const handleCreateRoom = () => {
     if (title) {
-      socket.emit('createRoom', title);
+      createRoom(title);
       navigate(`/room/${title}`);
     }
   };
@@ -41,7 +41,7 @@ function CreateRoomCard() {
       <Button
         miw="18rem"
         leftIcon={<IconMessageChatbot />}
-        onClick={CreateRoom}
+        onClick={handleCreateRoom}
       >
         Create Room
       </Button>

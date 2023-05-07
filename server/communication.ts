@@ -3,15 +3,11 @@ export interface ServerToClientEvents {
 }
 
 export interface ClientToServerEvents {
-  message: (message: string) => void;
-  storeUsername: (
-    username: string,
-    callback: (success: boolean) => void
-  ) => void;
+  message: (message: string, room: string) => void;
+  storeUsername: (username: string) => void;
   createRoom: (room: string) => void;
-  sendMessage: (message: string, room: string) => void;
-  joinRoom: (room: string) => void;
-  leaveRoom: (room: string) => void;
+  join: (room: string) => void;
+  leave: (room: string) => void;
 }
 
 export interface InterServerEvents {
