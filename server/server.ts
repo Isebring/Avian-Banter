@@ -83,7 +83,7 @@ const main = async () => {
 
     socket.on('join', (room) => {
       socket.join(room);
-      console.log(`${socket.id} joined room ${room}`);
+      console.log(`${socket.data.username} joined room ${room}`);
       socket
         .to(room)
         .emit('message', `User ${socket.data.username} has joined the room.`);
@@ -94,9 +94,11 @@ const main = async () => {
     });
 
     socket.on('leave', (room) => {
-      console.log(`${socket.id} left room ${room}`);
+      console.log(`${socket.data.username} left room ${room}`);
       socket.leave(room);
-      socket.to(room).emit('message', `User ${socket.id} has left the room.`);
+      socket
+        .to(room)
+        .emit('message', `User ${socket.data.username} has left the room.`);
     });
 
     io.emit('rooms', getRooms());
