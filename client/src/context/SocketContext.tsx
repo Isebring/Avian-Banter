@@ -13,7 +13,7 @@ interface ContextValues {
   createRoom: (title: string) => void;
   messages: string[];
   rooms: string[];
-  joinRoom: (room: string) => void;
+  join: (room: string) => void;
 }
 const socket = io();
 
@@ -36,7 +36,7 @@ function SocketProvider({ children }: PropsWithChildren) {
     }
   };
 
-  const joinRoom = (room: string) => {
+  const join = (room: string) => {
     if (room) {
       socket.emit('join', room);
     }
@@ -97,7 +97,7 @@ function SocketProvider({ children }: PropsWithChildren) {
         messages,
         createRoom,
         rooms,
-        joinRoom,
+        join,
       }}
     >
       {children}
