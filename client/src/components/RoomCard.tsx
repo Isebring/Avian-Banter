@@ -9,10 +9,10 @@ interface RoomCardProps {
 
 function RoomCard({ roomName }: RoomCardProps) {
   const navigate = useNavigate();
-  const { joinRoom } = useSocket();
+  const { join } = useSocket();
 
-  const handleJoinRoom = () => {
-    joinRoom(roomName);
+  const handleJoin = () => {
+    join(roomName);
     navigate(`/room/${roomName}`);
   };
 
@@ -34,7 +34,7 @@ function RoomCard({ roomName }: RoomCardProps) {
         {roomName}
       </Title>
       <Text m="md">Users</Text>
-      <Button leftIcon={<IconMessageChatbot />} onClick={handleJoinRoom}>
+      <Button leftIcon={<IconMessageChatbot />} onClick={handleJoin}>
         Join Room
       </Button>
     </Card>
