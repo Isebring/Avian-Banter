@@ -16,10 +16,12 @@ import { IconCircleCheck, IconUser } from '@tabler/icons-react';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useSocket } from '../context/SocketContext';
+import { useUsername } from '../context/UsernameContext';
 
 function LandingPage() {
   const { storeUsername } = useSocket();
-  const [username, setUsername] = useState('');
+  const { setUsername, username } = useUsername();
+  const [newUsername, setNewUsername] = useState('');
 
   useEffect(() => {
     const storedUsername = localStorage.getItem('username');
@@ -29,8 +31,16 @@ function LandingPage() {
   }, []);
 
   function handleUsernameChange(event: any) {
-    setUsername(event.currentTarget.value);
-    localStorage.setItem('username', event.currentTarget.value);
+    setNewUsername(event.currentTarget.value);
+  }
+
+  function handleButtonClick() {
+    if (newUsername) {
+      setUsername(newUsername);
+      localStorage.setItem('username', newUsername);
+      storeUsername(newUsername);
+      setNewUsername('');
+    }
   }
 
   return (
@@ -51,7 +61,7 @@ function LandingPage() {
               mt="md"
               icon={<IconUser size="1rem" />}
               placeholder="Your username..."
-              value={username}
+              value={newUsername}
               onChange={handleUsernameChange}
               rightSection={
                 <Tooltip
@@ -71,12 +81,12 @@ function LandingPage() {
           </Stack>
           <Group spacing="sm" position="center" mt="xl">
             <Link to={`/createroom?username=${username}`}>
-              <Button variant="filled" onClick={() => storeUsername(username)}>
+              <Button variant="filled" onClick={handleButtonClick}>
                 Create a room
               </Button>
             </Link>
             <Link to={`/joinroom?username=${username}`}>
-              <Button variant="outline" onClick={() => storeUsername(username)}>
+              <Button variant="outline" onClick={handleButtonClick}>
                 Join a room
               </Button>
             </Link>

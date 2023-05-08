@@ -8,8 +8,9 @@ import {
   Header,
   MediaQuery,
   ScrollArea,
+  Text,
   createStyles,
-  rem,
+  rem
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import {
@@ -18,6 +19,7 @@ import {
   IconMessageCircle,
 } from '@tabler/icons-react';
 import { Link } from 'react-router-dom';
+import { useUsername } from '../context/UsernameContext';
 
 const useStyles = createStyles((theme) => ({
   link: {
@@ -83,6 +85,7 @@ export function Navigationbar() {
   ] = useDisclosure(false);
   //   const [linksOpened, { toggle: toggleLinks }] = useDisclosure(false);
   const { classes, theme } = useStyles();
+  const { username } = useUsername();
 
   function scrollToTop() {
     window.scrollTo({
@@ -145,7 +148,7 @@ export function Navigationbar() {
               Messages
             </Button>
           </Group>
-
+      <Text>{username}</Text>
           <Group className={classes.hiddenMobile}></Group>
 
           <Burger

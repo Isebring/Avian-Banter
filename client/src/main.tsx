@@ -9,6 +9,7 @@ import {
 } from 'react-router-dom';
 import App from './App';
 import SocketProvider from './context/SocketContext';
+import { UsernameProvider } from './context/UsernameContext';
 import ChatPage from './pages/ChatPage';
 import CreateRoom from './pages/CreateRoom';
 import JoinRoom from './pages/JoinRoom';
@@ -29,7 +30,9 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
     <MantineProvider withGlobalStyles withNormalizeCSS>
       <SocketProvider>
+      <UsernameProvider>
         <RouterProvider router={router} />
+        </UsernameProvider>
       </SocketProvider>
     </MantineProvider>
   </React.StrictMode>
