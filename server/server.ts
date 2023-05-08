@@ -101,6 +101,10 @@ const main = async () => {
         .emit('message', `User ${socket.data.username} has left the room.`);
     });
 
+    socket.on('disconnect', () => {
+      console.log(`Client disconnected: ${socket.id}`);
+    });
+
     io.emit('rooms', getRooms());
   });
 
