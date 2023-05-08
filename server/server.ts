@@ -70,6 +70,8 @@ const main = async () => {
       socket
         .to(room)
         .emit('message', `User ${socket.data.username} has joined the room.`);
+
+      io.emit('rooms', getRooms());
     });
 
     socket.on('message', (message: string, room: string) => {
@@ -84,8 +86,7 @@ const main = async () => {
       console.log(`${socket.id} joined room ${room}`);
       socket.to(room).emit('message', `User ${socket.id} has joined the room.`);
 
-      const rooms = getRooms();
-      console.log(rooms);
+      io.emit('rooms', getRooms());
     });
 
     socket.on('leave', (room) => {
@@ -93,6 +94,8 @@ const main = async () => {
       socket.leave(room);
       socket.to(room).emit('message', `User ${socket.id} has left the room.`);
     });
+
+    io.emit('rooms', getRooms());
   });
 
   function getRooms() {
