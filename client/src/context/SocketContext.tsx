@@ -12,6 +12,7 @@ interface ContextValues {
   sendMessage: (room: string, message: string) => void;
   createRoom: (title: string) => void;
   messages: string[];
+  rooms: string[];
 }
 const socket = io();
 
@@ -20,6 +21,7 @@ export const useSocket = () => useContext(SocketContext);
 
 function SocketProvider({ children }: PropsWithChildren) {
   const [messages, setMessages] = useState<string[]>([]);
+  const [rooms, setRooms] = useState<string[]>([]);
 
   const storeUsername = (username: string) => {
     if (username) {
@@ -64,7 +66,7 @@ function SocketProvider({ children }: PropsWithChildren) {
     }
 
     function rooms(rooms: string[]) {
-      console.log(rooms);
+      setRooms(rooms);
     }
 
     socket.on('connect', connect);
@@ -82,7 +84,7 @@ function SocketProvider({ children }: PropsWithChildren) {
 
   return (
     <SocketContext.Provider
-      value={{ storeUsername, sendMessage, messages, createRoom }}
+      value={{ storeUsername, sendMessage, messages, createRoom, rooms }}
     >
       {children}
     </SocketContext.Provider>

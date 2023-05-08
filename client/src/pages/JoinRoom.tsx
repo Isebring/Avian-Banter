@@ -1,7 +1,10 @@
 import { Container, SimpleGrid, Title } from '@mantine/core';
 import RoomCard from '../components/RoomCard';
+import { useSocket } from '../context/SocketContext';
 
 function JoinRoom() {
+  const { rooms } = useSocket();
+
   return (
     <Container>
       <Title align="center" mb="xl" order={2}>
@@ -16,11 +19,9 @@ function JoinRoom() {
           { maxWidth: '50rem', cols: 1 },
         ]}
       >
-        <RoomCard />
-        <RoomCard />
-        <RoomCard />
-        <RoomCard />
-        <RoomCard />
+        {rooms.map((room) => (
+          <RoomCard key={room} roomName={room} />
+        ))}
       </SimpleGrid>
     </Container>
   );
