@@ -12,6 +12,8 @@ interface ContextValues {
   sendMessage: (room: string, message: string) => void;
   createRoom: (title: string) => void;
   messages: string[];
+  rooms: string[];
+  join: (room: string) => void;
 }
 const socket = io();
 
@@ -20,6 +22,7 @@ export const useSocket = () => useContext(SocketContext);
 
 function SocketProvider({ children }: PropsWithChildren) {
   const [messages, setMessages] = useState<string[]>([]);
+  const [rooms, setRooms] = useState<string[]>([]);
 
   const storeUsername = (username: string) => {
     if (username) {
@@ -30,6 +33,12 @@ function SocketProvider({ children }: PropsWithChildren) {
   const createRoom = (title: string) => {
     if (title) {
       socket.emit('createRoom', title);
+    }
+  };
+
+  const join = (room: string) => {
+    if (room) {
+      socket.emit('join', room);
     }
   };
 
@@ -63,20 +72,33 @@ function SocketProvider({ children }: PropsWithChildren) {
       console.log(message);
     }
 
+    function rooms(rooms: string[]) {
+      setRooms(rooms);
+    }
+
     socket.on('connect', connect);
     socket.on('disconnect', disconnect);
     socket.on('message', message);
+    socket.on('rooms', rooms);
 
     return () => {
       socket.off('connect', connect);
       socket.off('disconnect', disconnect);
       socket.off('message', message);
+      socket.off('rooms', rooms);
     };
   }, [socket]);
 
   return (
     <SocketContext.Provider
-      value={{ storeUsername, sendMessage, messages, createRoom }}
+      value={{
+        storeUsername,
+        sendMessage,
+        messages,
+        createRoom,
+        rooms,
+        join,
+      }}
     >
       {children}
     </SocketContext.Provider>

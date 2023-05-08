@@ -1,7 +1,21 @@
 import { Button, Card, Text, Title } from '@mantine/core';
 import { IconMessageChatbot } from '@tabler/icons-react';
+import { useNavigate } from 'react-router-dom';
+import { useSocket } from '../context/SocketContext';
 
-function RoomCard() {
+interface RoomCardProps {
+  roomName: string;
+}
+
+function RoomCard({ roomName }: RoomCardProps) {
+  const navigate = useNavigate();
+  const { join } = useSocket();
+
+  const handleJoin = () => {
+    join(roomName);
+    navigate(`/room/${roomName}`);
+  };
+
   return (
     <Card
       shadow="sm"
@@ -17,10 +31,12 @@ function RoomCard() {
       }}
     >
       <Title align="center" order={3}>
-        RoomName
+        {roomName}
       </Title>
       <Text m="md">Users</Text>
-      <Button leftIcon={<IconMessageChatbot />}>Join Room</Button>
+      <Button leftIcon={<IconMessageChatbot />} onClick={handleJoin}>
+        Join Room
+      </Button>
     </Card>
   );
 }

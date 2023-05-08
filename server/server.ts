@@ -70,6 +70,8 @@ const main = async () => {
       socket
         .to(room)
         .emit('message', `User ${socket.data.username} has joined the room.`);
+
+      io.emit('rooms', getRooms());
     });
 
     socket.on('message', (message: string, room: string) => {
@@ -81,16 +83,43 @@ const main = async () => {
 
     socket.on('join', (room) => {
       socket.join(room);
-      console.log(`${socket.id} joined room ${room}`);
-      socket.to(room).emit('message', `User ${socket.id} has joined the room.`);
+      console.log(`${socket.data.username} joined room ${room}`);
+      socket
+        .to(room)
+        .emit('message', `User ${socket.data.username} has joined the room.`);
+
+      socket.emit('message', `You have joined the room.`);
+
+      io.emit('rooms', getRooms());
     });
 
     socket.on('leave', (room) => {
-      console.log(`${socket.id} left room ${room}`);
+      console.log(`${socket.data.username} left room ${room}`);
       socket.leave(room);
-      socket.to(room).emit('message', `User ${socket.id} has left the room.`);
+      socket
+        .to(room)
+        .emit('message', `User ${socket.data.username} has left the room.`);
     });
+
+    socket.on('disconnect', () => {
+      console.log(`Client disconnected: ${socket.id}`);
+    });
+
+    io.emit('rooms', getRooms());
   });
+
+  function getRooms() {
+    const { rooms } = io.sockets.adapter;
+    const roomsFound: string[] = [];
+
+    for (const [name, setOfSocketIds] of rooms) {
+      if (!setOfSocketIds.has(name)) {
+        roomsFound.push(name);
+      }
+    }
+
+    return roomsFound;
+  }
 
   io.listen(3000);
   console.log('Connected and listening to port 3000');
