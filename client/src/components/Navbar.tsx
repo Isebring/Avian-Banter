@@ -12,7 +12,11 @@ import {
   rem,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { IconInfoCircle, IconMessageCircle } from '@tabler/icons-react';
+import {
+  IconDoor,
+  IconDoorEnter,
+  IconMessageCircle,
+} from '@tabler/icons-react';
 import { Link } from 'react-router-dom';
 
 const useStyles = createStyles((theme) => ({
@@ -108,13 +112,25 @@ export function Navigationbar() {
             spacing={0}
             className={classes.hiddenMobile}
           >
-            <Link to="/" className={classes.link} onClick={scrollToTop}>
-              <IconInfoCircle
+            <Link
+              to="/createroom"
+              className={classes.link}
+              onClick={scrollToTop}
+            >
+              <IconDoor
                 style={{ marginRight: '0.2rem' }}
                 size="1.2rem"
                 stroke={0.8}
               />
-              About
+              Create Room
+            </Link>
+            <Link to="/joinroom" className={classes.link} onClick={scrollToTop}>
+              <IconDoorEnter
+                style={{ marginRight: '0.2rem' }}
+                size="1.2rem"
+                stroke={0.8}
+              />
+              Join Room
             </Link>
             <Button
               className={classes.link}
@@ -130,13 +146,7 @@ export function Navigationbar() {
             </Button>
           </Group>
 
-          <Group className={classes.hiddenMobile}>
-            <Link
-              onClick={scrollToTop}
-              style={{ textDecoration: 'none' }}
-              to="/profile"
-            ></Link>
-          </Group>
+          <Group className={classes.hiddenMobile}></Group>
 
           <Burger
             opened={drawerOpened}
@@ -155,11 +165,11 @@ export function Navigationbar() {
         className={classes.hiddenDesktop}
         zIndex={1000000}
       >
-        <Link
+        {/* <Link
           onClick={scrollToTop}
           style={{ textDecoration: 'none' }}
           to="/profile"
-        ></Link>
+        ></Link> */}
 
         <ScrollArea h={`calc(100vh - ${rem(60)})`} mx="-md">
           <Divider
@@ -167,13 +177,26 @@ export function Navigationbar() {
             color={theme.colorScheme === 'dark' ? 'dark.5' : 'gray.1'}
           />
 
-          <a href="/" className={classes.link}>
-            <IconInfoCircle
+          <a href="/createroom" onClick={scrollToTop} className={classes.link}>
+            <IconDoor
               style={{ marginRight: '0.2rem' }}
               size="1.2rem"
               stroke={0.8}
             />
-            About
+            Create Room
+          </a>
+          <Divider
+            my="lg"
+            color={theme.colorScheme === 'dark' ? 'dark.5' : 'gray.1'}
+          />
+
+          <a href="/joinroom" onClick={scrollToTop} className={classes.link}>
+            <IconDoorEnter
+              style={{ marginRight: '0.2rem' }}
+              size="1.2rem"
+              stroke={0.8}
+            />
+            Join Room
           </a>
           <Divider
             my="lg"
