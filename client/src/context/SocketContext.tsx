@@ -63,14 +63,20 @@ function SocketProvider({ children }: PropsWithChildren) {
       console.log(message);
     }
 
+    function rooms(rooms: string[]) {
+      console.log(rooms);
+    }
+
     socket.on('connect', connect);
     socket.on('disconnect', disconnect);
     socket.on('message', message);
+    socket.on('rooms', rooms);
 
     return () => {
       socket.off('connect', connect);
       socket.off('disconnect', disconnect);
       socket.off('message', message);
+      socket.off('rooms', rooms);
     };
   }, [socket]);
 
