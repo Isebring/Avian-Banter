@@ -2,6 +2,12 @@ import { createAdapter } from '@socket.io/mongo-adapter';
 import dotenv from 'dotenv';
 import { MongoClient } from 'mongodb';
 import { Server } from 'socket.io';
+import {
+  ClientToServerEvents,
+  InterServerEvents,
+  ServerToClientEvents,
+  SocketData,
+} from './communication';
 
 dotenv.config();
 
@@ -12,7 +18,12 @@ if (!process.env.MONGO_URL) {
 const DB = 'mydb';
 const COLLECTION = 'socket.io-adapter-events';
 
-const io = new Server({
+const io = new Server<
+  ClientToServerEvents,
+  ServerToClientEvents,
+  InterServerEvents,
+  SocketData
+>({
   cors: {
     origin: 'http://localhost:5173',
     methods: ['GET', 'POST'],
@@ -41,29 +52,40 @@ const main = async () => {
     console.log(`Client connected: ${socket.id}`);
     socket.emit('message', 'Welcome to Avian Banter!');
 
-    socket.on(
-      'storeUsername',
-      async (username: string, callback: (success: boolean) => void) => {
-        if (!username) {
-          callback(false);
-          return;
-        }
-        socket.data.username = username;
+    socket.on('storeUsername', async (username: string) => {
+      socket.data.username = username;
 
-        // const usersCollection = mongoClient.db(DB).collection('users');
-        // await usersCollection.insertOne({ username });
-        // console.log(`Username stored: ${username}`);
-        // callback(true);
-      }
-    );
+      // const usersCollection = mongoClient.db(DB).collection('users');
+      // await usersCollection.insertOne({ username });
+      // console.log(`Username stored: ${username}`);
+      // callback(true);
+    });
 
-    socket.on('joinRoom', (room) => {
+    socket.on('createRoom', (room: string) => {
+      if (!room || !socket.data.username) return;
+      console.log(`Room created: ${room}`);
+      socket.join(room);
+      console.log(`${socket.data.username} joined room ${room}`);
+      socket.emit('message', `You have joined the room.`);
+      socket
+        .to(room)
+        .emit('message', `User ${socket.data.username} has joined the room.`);
+    });
+
+    socket.on('message', (message: string, room: string) => {
+      if (!message || !socket.data.username) return;
+      const formattedMessage = `${socket.data.username}: ${message}`;
+      socket.to(room).emit('message', formattedMessage);
+      socket.emit('message', formattedMessage);
+    });
+
+    socket.on('join', (room) => {
       socket.join(room);
       console.log(`${socket.id} joined room ${room}`);
       socket.to(room).emit('message', `User ${socket.id} has joined the room.`);
     });
 
-    socket.on('leaveRoom', (room) => {
+    socket.on('leave', (room) => {
       console.log(`${socket.id} left room ${room}`);
       socket.leave(room);
       socket.to(room).emit('message', `User ${socket.id} has left the room.`);
