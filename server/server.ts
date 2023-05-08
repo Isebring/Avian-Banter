@@ -83,6 +83,9 @@ const main = async () => {
       socket.join(room);
       console.log(`${socket.id} joined room ${room}`);
       socket.to(room).emit('message', `User ${socket.id} has joined the room.`);
+
+      const rooms = getRooms();
+      console.log(rooms);
     });
 
     socket.on('leave', (room) => {
@@ -91,6 +94,19 @@ const main = async () => {
       socket.to(room).emit('message', `User ${socket.id} has left the room.`);
     });
   });
+
+  function getRooms() {
+    const { rooms } = io.sockets.adapter;
+    const roomsFound: string[] = [];
+
+    for (const [name, setOfSocketIds] of rooms) {
+      if (!setOfSocketIds.has(name)) {
+        roomsFound.push(name);
+      }
+    }
+
+    return roomsFound;
+  }
 
   io.listen(3000);
   console.log('Connected and listening to port 3000');
