@@ -5,7 +5,7 @@ export interface ServerToClientEvents {
 }
 
 export interface ClientToServerEvents {
-  message: (message: string, room: string) => void;
+  message: (message: string, room: string, username: string) => void;
   storeUsername: (username: string) => void;
   createRoom: (room: string) => void;
   join: (room: string) => void;

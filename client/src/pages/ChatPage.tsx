@@ -1,8 +1,17 @@
-import { Button, Container, Flex, Group, Paper, Textarea } from '@mantine/core';
+import {
+  Button,
+  Container,
+  Flex,
+  Group,
+  Paper,
+  Textarea,
+  Title,
+} from '@mantine/core';
 import { IconMoodHappy } from '@tabler/icons-react';
 import EmojiPicker from 'emoji-picker-react';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import Message from '../components/Message';
 import { useSocket } from '../context/SocketContext';
 
 function ChatPage() {
@@ -32,9 +41,9 @@ function ChatPage() {
   return (
     <Flex justify="center" align="center">
       <Container size="xl">
-        <h1>Welcome to room {room}</h1>
+        <Title>Welcome to room {room}</Title>
         {messages.map((message, index) => (
-          <p key={index}>{message}</p>
+          <Message key={index} message={message} />
         ))}
         <form onSubmit={handleInput}>
           <Paper shadow="md">
