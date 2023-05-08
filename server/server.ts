@@ -84,7 +84,11 @@ const main = async () => {
     socket.on('join', (room) => {
       socket.join(room);
       console.log(`${socket.id} joined room ${room}`);
-      socket.to(room).emit('message', `User ${socket.id} has joined the room.`);
+      socket
+        .to(room)
+        .emit('message', `User ${socket.data.username} has joined the room.`);
+
+      socket.emit('message', `You have joined the room.`);
 
       io.emit('rooms', getRooms());
     });
