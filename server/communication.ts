@@ -1,6 +1,7 @@
 export interface ServerToClientEvents {
   message: (message: string) => void;
   rooms: (rooms: string[]) => void;
+  messageHistory: (messages: string[]) => void;
 }
 
 export interface ClientToServerEvents {
@@ -9,6 +10,7 @@ export interface ClientToServerEvents {
   createRoom: (room: string) => void;
   join: (room: string) => void;
   leave: (room: string) => void;
+  fetchMessageHistory: (room: string) => void;
 }
 
 export interface InterServerEvents {

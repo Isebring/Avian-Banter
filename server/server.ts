@@ -48,6 +48,9 @@ const main = async () => {
     })
   );
 
+  const usersCollection = mongoClient.db(DB).collection('users');
+  const messagesCollection = mongoClient.db(DB).collection('messages');
+
   io.on('connection', (socket) => {
     console.log(`Client connected: ${socket.id}`);
     socket.emit('message', 'Welcome to Avian Banter!');
@@ -55,10 +58,8 @@ const main = async () => {
     socket.on('storeUsername', async (username: string) => {
       socket.data.username = username;
 
-      // const usersCollection = mongoClient.db(DB).collection('users');
-      // await usersCollection.insertOne({ username });
-      // console.log(`Username stored: ${username}`);
-      // callback(true);
+      await usersCollection.insertOne({ username });
+      console.log(`Username stored: ${username}`);
     });
 
     socket.on('createRoom', (room: string) => {
@@ -74,9 +75,28 @@ const main = async () => {
       io.emit('rooms', getRooms());
     });
 
-    socket.on('message', (message: string, room: string) => {
+    socket.on('fetchMessageHistory', async (room: string) => {
+      const messageHistory = await messagesCollection
+        .find({ room })
+        .sort({ createdAt: 1 })
+        .toArray();
+
+      socket.emit(
+        'messageHistory',
+        messageHistory.map((m) => m.message)
+      );
+    });
+
+    socket.on('message', async (message: string, room: string) => {
       if (!message || !socket.data.username) return;
       const formattedMessage = `${socket.data.username}: ${message}`;
+
+      await messagesCollection.insertOne({
+        room,
+        message: formattedMessage,
+        createdAt: new Date(),
+      });
+
       socket.to(room).emit('message', formattedMessage);
       socket.emit('message', formattedMessage);
     });
