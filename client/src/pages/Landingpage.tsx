@@ -13,43 +13,21 @@ import {
   Tooltip,
 } from '@mantine/core';
 import { IconCircleCheck, IconUser } from '@tabler/icons-react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 // import socket from '../socket';
 import { Link } from 'react-router-dom';
 import { useSocket } from '../context/SocketContext';
 
 function LandingPage() {
-  const { socket } = useSocket();
+  const { storeUsername } = useSocket();
   const [username, setUsername] = useState('');
-
-  function StoreUsername() {
-    if (username) {
-      socket.emit('storeUsername', username, (success: boolean) => {
-        if (success) {
-          console.log('Username stored successfully');
-        } else {
-          console.error('Error storing the username');
-        }
-      });
-    }
-  }
-
-  useEffect(() => {
-    socket.on('message', (msg: string) => {
-      console.log(`Message from server: ${msg}`);
-    });
-
-    return () => {
-      socket.off('message');
-    };
-  }, [socket]);
 
   return (
     <Container fluid>
       <Flex align="center" justify="space-between">
-        <Box sx={{ flex: 1, marginLeft: 'auto' }}>
+        <Box sx={{ flex: 1 }}>
           <Title pl="lg">
-            AvianBanter is a Chat Application built for everyone with a beak
+            Avian Banter is a Chat Application built for everyone with a beak
           </Title>
           <Text pl="lg" size="lg" color="gray">
             Here you can create or join chat rooms. You can also send private
@@ -82,19 +60,19 @@ function LandingPage() {
           </Stack>
           <Group spacing="sm" position="center" mt="xl">
             <Link to="/createroom">
-              <Button variant="filled" onClick={StoreUsername}>
+              <Button variant="filled" onClick={() => storeUsername(username)}>
                 Create a room
               </Button>
             </Link>
             <Link to="/joinroom">
-              <Button variant="outline" onClick={StoreUsername}>
+              <Button variant="outline" onClick={() => storeUsername(username)}>
                 Join a room
               </Button>
             </Link>
           </Group>
         </Box>
         <MediaQuery query="(max-width: 800px)" styles={{ display: 'none' }}>
-          <Box sx={{ flex: 1, marginLeft: 'auto' }}>
+          <Box sx={{ flex: 1 }}>
             <img
               src="/avian-phone.png"
               alt="Bird browsing a smartphone"
