@@ -95,7 +95,7 @@ function LandingPage() {
         <MediaQuery query="(max-width: 800px)" styles={{ display: 'none' }}>
           <Box sx={{ flex: 1 }}>
             <img
-              src="/avian-phone.png"
+              src="/avian-phone-upscaled.png"
               alt="Bird browsing a smartphone"
               style={{ width: '100%', height: '100vh', objectFit: 'cover' }}
             />
