@@ -14,7 +14,7 @@ import {
 } from '@mantine/core';
 import { IconCircleCheck, IconUser } from '@tabler/icons-react';
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useSocket } from '../context/SocketContext';
 import { useUsername } from '../context/UsernameContext';
 
@@ -22,6 +22,14 @@ function LandingPage() {
   const { storeUsername } = useSocket();
   const { setUsername, username } = useUsername();
   const [newUsername, setNewUsername] = useState('');
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const sessionID = localStorage.getItem('sessionID');
+    if (sessionID) {
+      navigate('/joinroom');
+    }
+  }, [navigate]);
 
   useEffect(() => {
     const storedUsername = localStorage.getItem('username');
