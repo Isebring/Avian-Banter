@@ -15,6 +15,7 @@ interface ContextValues {
   rooms: string[];
   join: (room: string) => void;
   fetchMessageHistory: (room: string) => void;
+  sendTypingStatus: (room: string, isTyping: boolean) => void;
 }
 export const socket = io({ autoConnect: false });
 
@@ -51,6 +52,11 @@ function SocketProvider({ children }: PropsWithChildren) {
   const sendMessage = (room: string, message: string) => {
     if (!room) throw Error("Can't send message without a room");
     socket.emit('message', message, room);
+  };
+
+  const sendTypingStatus = (room: string, isTyping: boolean) => {
+    if (!room) throw Error("Can't send typing status without a room");
+    socket.emit('typing', { room, isTyping });
   };
 
   useEffect(() => {
@@ -111,6 +117,7 @@ function SocketProvider({ children }: PropsWithChildren) {
         rooms,
         join,
         fetchMessageHistory,
+        sendTypingStatus,
       }}
     >
       {children}
