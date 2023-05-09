@@ -14,8 +14,9 @@ interface ContextValues {
   messages: string[];
   rooms: string[];
   join: (room: string) => void;
+  fetchMessageHistory: (room: string) => void;
 }
-const socket = io();
+export const socket = io({ autoConnect: false });
 
 const SocketContext = createContext<ContextValues>(null as any);
 export const useSocket = () => useContext(SocketContext);
@@ -25,9 +26,8 @@ function SocketProvider({ children }: PropsWithChildren) {
   const [rooms, setRooms] = useState<string[]>([]);
 
   const storeUsername = (username: string) => {
-    if (username) {
-      socket.emit('storeUsername', username);
-    }
+    socket.auth = { username };
+    socket.connect();
   };
 
   const createRoom = (title: string) => {
@@ -39,6 +39,12 @@ function SocketProvider({ children }: PropsWithChildren) {
   const join = (room: string) => {
     if (room) {
       socket.emit('join', room);
+    }
+  };
+
+  const fetchMessageHistory = (room: string) => {
+    if (room) {
+      socket.emit('fetchMessageHistory', room);
     }
   };
 
@@ -76,16 +82,22 @@ function SocketProvider({ children }: PropsWithChildren) {
       setRooms(rooms);
     }
 
+    function messageHistory(messages: string[]) {
+      setMessages(messages);
+    }
+
     socket.on('connect', connect);
     socket.on('disconnect', disconnect);
     socket.on('message', message);
     socket.on('rooms', rooms);
+    socket.on('messageHistory', messageHistory);
 
     return () => {
       socket.off('connect', connect);
       socket.off('disconnect', disconnect);
       socket.off('message', message);
       socket.off('rooms', rooms);
+      socket.off('messageHistory', messageHistory);
     };
   }, [socket]);
 
@@ -98,6 +110,7 @@ function SocketProvider({ children }: PropsWithChildren) {
         createRoom,
         rooms,
         join,
+        fetchMessageHistory,
       }}
     >
       {children}
