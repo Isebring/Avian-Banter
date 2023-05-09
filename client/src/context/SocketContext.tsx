@@ -16,7 +16,7 @@ interface ContextValues {
   join: (room: string) => void;
   fetchMessageHistory: (room: string) => void;
 }
-const socket = io();
+export const socket = io({ autoConnect: false });
 
 const SocketContext = createContext<ContextValues>(null as any);
 export const useSocket = () => useContext(SocketContext);
@@ -26,9 +26,8 @@ function SocketProvider({ children }: PropsWithChildren) {
   const [rooms, setRooms] = useState<string[]>([]);
 
   const storeUsername = (username: string) => {
-    if (username) {
-      socket.emit('storeUsername', username);
-    }
+    socket.auth = { username };
+    socket.connect();
   };
 
   const createRoom = (title: string) => {

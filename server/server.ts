@@ -49,11 +49,40 @@ const main = async () => {
   );
 
   const usersCollection = mongoClient.db(DB).collection('users');
+  const sessionsCollection = mongoClient
+    .db(DB)
+    .collection<SocketData>('sessions');
   const messagesCollection = mongoClient.db(DB).collection('messages');
+
+  io.use(async (socket, next) => {
+    const sessionID = socket.handshake.auth.sessionID;
+    if (sessionID) {
+      // find existing session
+      const session = await sessionsCollection.findOne({ sessionID });
+      if (session) {
+        socket.data.sessionID = session.sessionID;
+        socket.data.userID = session.userID;
+        socket.data.username = session.username;
+        return next();
+      }
+    }
+    const username = socket.handshake.auth.username;
+    if (!username) {
+      return next(new Error('invalid username'));
+    }
+    // create new session
+    socket.data.sessionID = Date.now().toString();
+    socket.data.userID = Date.now().toString();
+    socket.data.username = username;
+    await sessionsCollection.insertOne(socket.data as SocketData);
+    next();
+  });
 
   io.on('connection', (socket) => {
     console.log(`Client connected: ${socket.id}`);
     socket.emit('message', 'Welcome to Avian Banter!');
+
+    socket.emit('session', socket.data as SocketData);
 
     socket.on('storeUsername', async (username: string) => {
       socket.data.username = username;
