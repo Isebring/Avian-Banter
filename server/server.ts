@@ -130,8 +130,12 @@ const main = async () => {
       socket.emit('message', formattedMessage);
     });
 
-    socket.on('typing', (room: string) => {
-      socket.to(room).emit('typing', room, socket.data.username!);
+    socket.on('userTyping', (room: string, username: string) => {
+      socket.broadcast.to(room).emit('userTyping', room, username);
+    });
+
+    socket.on('userStoppedTyping', (room: string, username: string) => {
+      socket.broadcast.to(room).emit('userStoppedTyping', room, username);
     });
 
     socket.on('join', (room) => {
