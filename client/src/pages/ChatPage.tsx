@@ -4,6 +4,7 @@ import {
   Flex,
   Group,
   Paper,
+  Text,
   Textarea,
   Title,
 } from '@mantine/core';
@@ -13,12 +14,14 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import Message from '../components/Message';
 import { useSocket } from '../context/SocketContext';
+import { useUsername } from '../context/UsernameContext';
 
 function ChatPage() {
   const { room } = useParams<{ room: string }>();
   const { sendMessage, messages, fetchMessageHistory } = useSocket();
   const [inputMessage, setInputMessage] = useState('');
   const [showPicker, setShowPicker] = useState(false);
+  const { username } = useUsername();
 
   useEffect(() => {
     if (room) {
@@ -46,13 +49,24 @@ function ChatPage() {
           <Message key={index} message={message} />
         ))}
         <form onSubmit={handleInput}>
-          <Paper shadow="md">
+          <Paper mt="xl" mb="lg" shadow="md">
+            <Text size="xs" ml="lg" pt="xs" pb="xs">
+              {username}
+            </Text>
             <Textarea
+              ml="lg"
+              mr="lg"
               value={inputMessage}
               onChange={(event) => setInputMessage(event.currentTarget.value)}
               placeholder="Type a message..."
             />
-            <Group sx={{ display: 'flex', justifyContent: 'space-between' }}>
+            <Group
+              sx={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+              }}
+            >
               <Button
                 variant="hidden"
                 onClick={() => setShowPicker(!showPicker)}
@@ -63,7 +77,13 @@ function ChatPage() {
               {showPicker ? (
                 <EmojiPicker emojiStyle="native" onEmojiClick={onEmojiClick} />
               ) : null}
-              <Button size="xs" type="submit" style={{ marginRight: '0.5rem' }}>
+              <Button
+                mt="xs"
+                mb="xs"
+                size="xs"
+                type="submit"
+                style={{ marginRight: '1.2rem' }}
+              >
                 Send
               </Button>
             </Group>
