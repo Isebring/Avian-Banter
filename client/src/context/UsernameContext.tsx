@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useState } from 'react';
+import { SocketData } from '../../../server/communication';
 import { socket } from './SocketContext';
 
 interface UsernameContextType {
