@@ -130,6 +130,10 @@ const main = async () => {
       socket.emit('message', formattedMessage);
     });
 
+    socket.on('typing', (room: string) => {
+      socket.to(room).emit('typing', room, socket.data.username!);
+    });
+
     socket.on('join', (room) => {
       socket.join(room);
       console.log(`${socket.data.username} joined room ${room}`);
