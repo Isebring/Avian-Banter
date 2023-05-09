@@ -15,7 +15,9 @@ interface ContextValues {
   rooms: string[];
   join: (room: string) => void;
   fetchMessageHistory: (room: string) => void;
-  sendTypingStatus: (room: string, isTyping: boolean) => void;
+  userTyping: (room: string, username: string) => void;
+  userStoppedTyping: (room: string, username: string) => void;
+  typingUsers: string[];
 }
 export const socket = io({ autoConnect: false });
 
@@ -25,6 +27,7 @@ export const useSocket = () => useContext(SocketContext);
 function SocketProvider({ children }: PropsWithChildren) {
   const [messages, setMessages] = useState<string[]>([]);
   const [rooms, setRooms] = useState<string[]>([]);
+  const [typingUsers, setTypingUsers] = useState<string[]>([]);
 
   const storeUsername = (username: string) => {
     socket.auth = { username };
@@ -54,9 +57,12 @@ function SocketProvider({ children }: PropsWithChildren) {
     socket.emit('message', message, room);
   };
 
-  const sendTypingStatus = (room: string, isTyping: boolean) => {
-    if (!room) throw Error("Can't send typing status without a room");
-    socket.emit('typing', { room, isTyping });
+  const userTyping = (room: string, username: string) => {
+    socket.emit('userTyping', room, username);
+  };
+
+  const userStoppedTyping = (room: string, username: string) => {
+    socket.emit('userStoppedTyping', room, username);
   };
 
   useEffect(() => {
@@ -92,11 +98,23 @@ function SocketProvider({ children }: PropsWithChildren) {
       setMessages(messages);
     }
 
+    function userTyping(room: string, username: string) {
+      setTypingUsers((prevUsers) => [...prevUsers, username]);
+    }
+
+    function userStoppedTyping(room: string, username: string) {
+      setTypingUsers((prevUsers) =>
+        prevUsers.filter((user) => user !== username)
+      );
+    }
+
     socket.on('connect', connect);
     socket.on('disconnect', disconnect);
     socket.on('message', message);
     socket.on('rooms', rooms);
     socket.on('messageHistory', messageHistory);
+    socket.on('userTyping', userTyping);
+    socket.on('userStoppedTyping', userStoppedTyping);
 
     return () => {
       socket.off('connect', connect);
@@ -104,6 +122,8 @@ function SocketProvider({ children }: PropsWithChildren) {
       socket.off('message', message);
       socket.off('rooms', rooms);
       socket.off('messageHistory', messageHistory);
+      socket.off('userTyping', userTyping);
+      socket.off('userStoppedTyping', userStoppedTyping);
     };
   }, [socket]);
 
@@ -117,7 +137,9 @@ function SocketProvider({ children }: PropsWithChildren) {
         rooms,
         join,
         fetchMessageHistory,
-        sendTypingStatus,
+        userTyping,
+        userStoppedTyping,
+        typingUsers,
       }}
     >
       {children}
