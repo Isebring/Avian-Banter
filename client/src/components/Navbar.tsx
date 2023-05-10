@@ -104,9 +104,11 @@ export function Navigationbar() {
     closeMessagesDrawer();
   }
 
-  const handleCreateDMRoom = (recipientUserID: string) => {
-    createDMRoom(recipientUserID);
-    navigate(`dm/${recipientUserID}`);
+  const handleCreateDMRoom = async (recipientUserID: string) => {
+    const room = await createDMRoom(recipientUserID);
+    if (room) {
+      navigate(`dm/${room}`);
+    }
   };
 
   return (

@@ -17,7 +17,7 @@ interface ContextValues {
   join: (room: string) => void;
   fetchMessageHistory: (room: string) => void;
   users: SocketData[];
-  createDMRoom: (recipientUserID: string) => void;
+  createDMRoom: (recipientUserID: string) => Promise<string | null>;
 }
 export const socket = io({ autoConnect: false });
 
@@ -57,14 +57,24 @@ function SocketProvider({ children }: PropsWithChildren) {
     socket.emit('message', message, room);
   };
 
-  const createDMRoom = (recipientUserID: string) => {
-    if (recipientUserID) {
-      const currentUserID = users.find(
-        (user) => user.sessionID === socket.id
-      )?.userID;
-      const room = `dm-${currentUserID}-${recipientUserID}`;
-      socket.emit('createRoom', room);
-    }
+  const createDMRoom = (recipientUserID: string): Promise<string | null> => {
+    const currentUserID = localStorage.getItem('userID');
+    console.log(users);
+    return new Promise((resolve) => {
+      if (recipientUserID && currentUserID) {
+        const ids = [currentUserID, recipientUserID].sort();
+        let room = `${ids[0]}-${ids[1]}`;
+        socket.emit('createRoom', room);
+        socket.once('roomCreated', (createdRoom) => {
+          if (createdRoom === room) {
+            resolve(room);
+          }
+        });
+      } else {
+        console.error('Recipient or current user not found');
+        resolve(null);
+      }
+    });
   };
 
   useEffect(() => {
@@ -90,7 +100,7 @@ function SocketProvider({ children }: PropsWithChildren) {
     return () => {
       socket.off('users', onUsersUpdate);
     };
-  }, [socket, users]);
+  }, [socket]);
 
   useEffect(() => {
     function connect() {
