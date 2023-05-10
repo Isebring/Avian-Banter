@@ -49,7 +49,6 @@ const main = async () => {
     })
   );
 
-  const usersCollection = mongoClient.db(DB).collection('users');
   const sessionsCollection = mongoClient
     .db(DB)
     .collection<SocketData>('sessions');
@@ -79,8 +78,12 @@ const main = async () => {
     next();
   });
 
-  io.on('connection', (socket) => {
+  io.on('connection', async (socket) => {
     console.log(`Client connected: ${socket.id}`);
+    const users = await sessionsCollection.find({}).toArray();
+    socket.emit('users', users);
+    console.log('Connected users:', users);
+
     socket.emit('systemMessage', 'Welcome to Avian Banter!');
 
     socket.emit('session', socket.data as SocketData);
@@ -88,7 +91,6 @@ const main = async () => {
     socket.on('storeUsername', async (username: string) => {
       socket.data.username = username;
 
-      await usersCollection.insertOne({ username });
       console.log(`Username stored: ${username}`);
     });
 
