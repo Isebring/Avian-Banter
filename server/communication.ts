@@ -6,6 +6,7 @@ export interface ServerToClientEvents {
   session: (user: SocketData) => void;
   typing: (room: string, username: string) => void;
   users: (users: SocketData[]) => void;
+  roomCreated: (room: string) => void;
 }
 
 export interface ClientToServerEvents {

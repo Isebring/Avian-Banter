@@ -106,8 +106,8 @@ const main = async () => {
           'systemMessage',
           `User ${socket.data.username} has joined the room.`
         );
-
       io.emit('rooms', getRooms());
+      socket.emit('roomCreated', room);
     });
 
     socket.on('fetchMessageHistory', async (room: string) => {
