@@ -130,14 +130,9 @@ const main = async () => {
       socket.emit('message', formattedMessage);
     });
 
-    socket.on('userTyping', (room: string, username: string) => {
-      socket.broadcast.to(room).emit('userTyping', room, username);
+    socket.on('typing', (isTyping: boolean, room: string) => {
+      socket.broadcast.to(room).emit('typing', socket.data.username!, isTyping);
       console.log(`${socket.data.username} is typing`);
-    });
-
-    socket.on('userStoppedTyping', (room: string, username: string) => {
-      socket.broadcast.to(room).emit('userStoppedTyping', room, username);
-      console.log(`${socket.data.username} is no longer typing`);
     });
 
     socket.on('join', (room) => {
