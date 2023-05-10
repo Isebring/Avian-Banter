@@ -1,14 +1,17 @@
 export interface ServerToClientEvents {
   message: (message: string) => void;
   rooms: (rooms: string[]) => void;
+  messageHistory: (messages: string[]) => void;
+  session: (user: SocketData) => void;
 }
 
 export interface ClientToServerEvents {
-  message: (message: string, room: string) => void;
+  message: (message: string, room: string, username: string) => void;
   storeUsername: (username: string) => void;
   createRoom: (room: string) => void;
   join: (room: string) => void;
   leave: (room: string) => void;
+  fetchMessageHistory: (room: string) => void;
 }
 
 export interface InterServerEvents {
@@ -17,4 +20,6 @@ export interface InterServerEvents {
 
 export interface SocketData {
   username: string;
+  sessionID: string;
+  userID: string;
 }
