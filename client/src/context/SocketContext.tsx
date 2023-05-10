@@ -5,7 +5,7 @@ import {
   useEffect,
   useState,
 } from 'react';
-import { io } from 'socket.io-client';
+import { Socket, io } from 'socket.io-client';
 import { Message } from '../../../server/communication';
 
 interface ContextValues {
@@ -16,19 +16,24 @@ interface ContextValues {
   rooms: string[];
   join: (room: string) => void;
   fetchMessageHistory: (room: string) => void;
-  userTyping: (room: string, username: string) => void;
-  userStoppedTyping: (room: string, username: string) => void;
-  typingUsers: string[];
+  // listenForTypingEvents: (
+  //   callback: (data: { username: string; isTyping: boolean }) => void
+  // ) => void;
+  // typingUsers: { [key: string]: boolean };
 }
-export const socket = io({ autoConnect: false });
+
+export const socket: Socket = io({ autoConnect: false });
 
 const SocketContext = createContext<ContextValues>(null as any);
+
 export const useSocket = () => useContext(SocketContext);
 
 function SocketProvider({ children }: PropsWithChildren) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [rooms, setRooms] = useState<string[]>([]);
-  const [typingUsers, setTypingUsers] = useState<string[]>([]);
+  // const [typingUsers, setTypingUsers] = useState<{ [key: string]: boolean }>(
+  //   {}
+  // );
 
   const storeUsername = (username: string) => {
     socket.auth = { username };
@@ -53,18 +58,29 @@ function SocketProvider({ children }: PropsWithChildren) {
     }
   };
 
-  const sendMessage = (message: Message, room: string) => {
+  const sendMessage = (message: Message, room: string, eventType?: string) => {
     if (!room) throw Error("Can't send message without a room");
-    socket.emit('message', message, room);
+    socket.emit(eventType || 'message', message, room);
   };
 
-  const userTyping = (room: string, username: string) => {
-    socket.emit('userTyping', room, username);
-  };
-
-  const userStoppedTyping = (room: string, username: string) => {
-    socket.emit('userStoppedTyping', room, username);
-  };
+  // const listenForTypingEvents = (
+  //   callback: (data: { username: string; isTyping: boolean }) => void
+  // ) => {
+  //   socket.on('typing', (data: { username: string }) => {
+  //     setTypingUsers((prevTypingUsers) => ({
+  //       ...prevTypingUsers,
+  //       [data.username]: true,
+  //     }));
+  //     callback({ username: data.username, isTyping: true });
+  //   });
+  //   socket.on('stop-typing', (data: { username: string }) => {
+  //     setTypingUsers((prevTypingUsers) => ({
+  //       ...prevTypingUsers,
+  //       [data.username]: false,
+  //     }));
+  //     callback({ username: data.username, isTyping: false });
+  //   });
+  // };
 
   useEffect(() => {
     const onMessage = (message: Message) => {
@@ -99,23 +115,11 @@ function SocketProvider({ children }: PropsWithChildren) {
       setMessages(messages);
     }
 
-    function userTyping(room: string, username: string) {
-      setTypingUsers((prevUsers) => [...prevUsers, username]);
-    }
-
-    function userStoppedTyping(room: string, username: string) {
-      setTypingUsers((prevUsers) =>
-        prevUsers.filter((user) => user !== username)
-      );
-    }
-
     socket.on('connect', connect);
     socket.on('disconnect', disconnect);
     socket.on('message', message);
     socket.on('rooms', rooms);
     socket.on('messageHistory', messageHistory);
-    socket.on('userTyping', userTyping);
-    socket.on('userStoppedTyping', userStoppedTyping);
 
     return () => {
       socket.off('connect', connect);
@@ -123,8 +127,6 @@ function SocketProvider({ children }: PropsWithChildren) {
       socket.off('message', message);
       socket.off('rooms', rooms);
       socket.off('messageHistory', messageHistory);
-      socket.off('userTyping', userTyping);
-      socket.off('userStoppedTyping', userStoppedTyping);
     };
   }, [socket]);
 
@@ -138,9 +140,8 @@ function SocketProvider({ children }: PropsWithChildren) {
         rooms,
         join,
         fetchMessageHistory,
-        userTyping,
-        userStoppedTyping,
-        typingUsers,
+        // listenForTypingEvents,
+        // typingUsers,
       }}
     >
       {children}
