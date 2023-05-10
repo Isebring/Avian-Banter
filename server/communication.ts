@@ -5,6 +5,7 @@ export interface ServerToClientEvents {
   messageHistory: (messages: Message[]) => void;
   session: (user: SocketData) => void;
   typing: (username: string, isTyping: boolean) => void;
+  userTyping: (username: string, isTyping: boolean) => void;
 }
 
 export interface ClientToServerEvents {

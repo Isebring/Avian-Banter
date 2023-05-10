@@ -24,6 +24,10 @@ function ChatPage() {
   const [showPicker, setShowPicker] = useState(false);
   const { username } = useUsername();
   const [typingUsers, setTypingUsers] = useState<string[]>([]);
+  const [userIsTyping, setUserIsTyping] = useState(false);
+  const [userIdToUsername, setUserIdToUsername] = useState<{
+    [key: string]: string;
+  }>({});
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
@@ -32,6 +36,31 @@ function ChatPage() {
     }
   }, [room, fetchMessageHistory]);
 
+  useEffect(() => {
+    if (socket) {
+      socket.on('userTyping', (userId, isTyping, username) => {
+        if (userId !== socket.id) {
+          if (isTyping) {
+            setTypingUsers((users) => {
+              const newUserList = [...users, userId];
+              setUserIdToUsername((prevMapping) => ({
+                ...prevMapping,
+                [userId]: username,
+              }));
+              return newUserList;
+            });
+          } else {
+            setTypingUsers((users) => users.filter((user) => user !== userId));
+          }
+        }
+      });
+
+      return () => {
+        socket.off('userTyping');
+      };
+    }
+  }, [socket]);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (inputMessage.trim() !== '' && room) {
@@ -39,31 +68,43 @@ function ChatPage() {
       setInputMessage('');
     }
   };
-
   const onInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setInputMessage(event.target.value);
-    if (event.target.value.trim() !== '') {
-      socket.emit('typing', true, room);
-      if (typingTimeoutRef.current) {
-        clearTimeout(typingTimeoutRef.current);
-        console.log(typingUsers);
-      }
-      typingTimeoutRef.current = setTimeout(() => {
-        socket.emit('typing', false, room);
-      }, 2000);
-      // Add the current user to typingUsers
-      if (!typingUsers.includes(username)) {
-        setTypingUsers((users) => [...users, username]);
-      }
-    } else {
-      // Remove the current user from typingUsers
-      setTypingUsers((users) => users.filter((user) => user !== username));
-    }
-  };
+    const isTyping = event.target.value.trim() !== '';
 
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current);
+    }
+
+    if (isTyping && !userIsTyping) {
+      setUserIsTyping(true);
+      socket.emit('typing', true, room, username);
+    }
+
+    typingTimeoutRef.current = setTimeout(() => {
+      if (userIsTyping) {
+        setUserIsTyping(false);
+        socket.emit('typing', false, room, username);
+      }
+    }, 2000);
+  };
   const onEmojiClick = (emojiObject: any) => {
     setInputMessage((prevInput) => prevInput + emojiObject.emoji);
   };
+  useEffect(() => {
+    if (socket && userIsTyping !== typingUsers.includes(socket.id)) {
+      socket.emit('typing', userIsTyping, room, username); // <- Pass "username" as the third parameter
+    }
+  }, [socket, userIsTyping, room, typingUsers, username]); // <- Add "username" as a dependency
+
+  useEffect(() => {
+    if (socket && username) {
+      setUserIdToUsername((prevMapping) => ({
+        ...prevMapping,
+        [socket.id]: username,
+      }));
+    }
+  }, [socket, username]);
 
   return (
     <Flex justify="center" align="center">
@@ -75,8 +116,14 @@ function ChatPage() {
         {typingUsers.length > 0 && (
           <Text>
             {typingUsers.length > 1
-              ? typingUsers.join(', ') + ' are typing...'
-              : typingUsers[0] + ' is typing...'}
+              ? typingUsers
+                  .map((id) =>
+                    id === socket.id ? username : userIdToUsername[id]
+                  )
+                  .join(', ') + ' are typing...'
+              : (typingUsers[0] === socket.id
+                  ? username
+                  : userIdToUsername[typingUsers[0]]) + ' is typing...'}
           </Text>
         )}
         <form onSubmit={handleSubmit}>

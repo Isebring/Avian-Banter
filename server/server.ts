@@ -135,13 +135,8 @@ const main = async () => {
     });
 
     socket.on('typing', (isTyping: boolean, room: string) => {
-      if (isTyping) {
-        console.log(`${socket.data.username} is typing in room ${room}`);
-        socket.to(room).emit('typing', socket.data.username!, true);
-      } else {
-        console.log(`${socket.data.username} stopped typing in room ${room}`);
-        socket.to(room).emit('typing', socket.data.username!, false);
-      }
+      console.log(`${socket.data.username} is typing in room ${room}`);
+      socket.to(room).emit('userTyping', socket.id, isTyping);
     });
 
     socket.on('join', (room) => {
