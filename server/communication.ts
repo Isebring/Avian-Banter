@@ -3,8 +3,7 @@ export interface ServerToClientEvents {
   rooms: (rooms: string[]) => void;
   messageHistory: (messages: string[]) => void;
   session: (user: SocketData) => void;
-  userTyping: (room: string, username: string) => void;
-  userStoppedTyping: (room: string, username: string) => void;
+  typing: (username: string, isTyping: boolean) => void;
 }
 
 export interface ClientToServerEvents {
@@ -14,8 +13,7 @@ export interface ClientToServerEvents {
   join: (room: string) => void;
   leave: (room: string) => void;
   fetchMessageHistory: (room: string) => void;
-  userTyping: (room: string, username: string) => void;
-  userStoppedTyping: (room: string, username: string) => void;
+  typing: (isTyping: boolean, room: string) => void;
 }
 
 export interface InterServerEvents {
