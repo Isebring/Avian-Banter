@@ -1,10 +1,12 @@
 import {
+  Box,
   Button,
   Container,
   Flex,
   Group,
+  Input,
   Paper,
-  Textarea,
+  Text,
   Title,
 } from '@mantine/core';
 import { IconMoodHappy } from '@tabler/icons-react';
@@ -13,12 +15,15 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import Message from '../components/Message';
 import { useSocket } from '../context/SocketContext';
+import { useUsername } from '../context/UsernameContext';
 
 function ChatPage() {
   const { room } = useParams<{ room: string }>();
   const { sendMessage, messages, fetchMessageHistory } = useSocket();
   const [inputMessage, setInputMessage] = useState('');
   const [showPicker, setShowPicker] = useState(false);
+  const { username } = useUsername();
+  const sender = username || 'Anonymous';
 
   useEffect(() => {
     if (room) {
@@ -40,30 +45,57 @@ function ChatPage() {
 
   return (
     <Flex justify="center" align="center">
-      <Container size="xl">
+      <Container>
         <Title>Welcome to room {room}</Title>
         {messages.map((message, index) => (
-          <Message key={index} message={message} />
+          <Message
+            key={index}
+            message={{ text: message, sender: message }}
+            sender={sender}
+          />
         ))}
         <form onSubmit={handleInput}>
-          <Paper shadow="md">
-            <Textarea
-              value={inputMessage}
-              onChange={(event) => setInputMessage(event.currentTarget.value)}
-              placeholder="Type a message..."
-            />
-            <Group sx={{ display: 'flex', justifyContent: 'space-between' }}>
+          <Paper mt="xl" mb="lg" shadow="md">
+            <Text size="xs" ml="lg" pt="xs" pb="xs">
+              {username}
+            </Text>
+            <Box sx={{ position: 'relative' }}>
+              <Input
+                ml="lg"
+                mr="lg"
+                value={inputMessage}
+                onChange={(event) => setInputMessage(event.currentTarget.value)}
+                placeholder="Type a message..."
+              />
               <Button
                 variant="hidden"
                 onClick={() => setShowPicker(!showPicker)}
-                style={{ marginLeft: '0.1rem' }}
+                sx={{
+                  position: 'absolute',
+                  top: 0,
+                  right: 5,
+                  width: 'auto',
+                }}
               >
                 <IconMoodHappy stroke={0.7} />
               </Button>
+            </Box>
+            <Group
+              sx={{
+                display: 'flex',
+                justifyContent: 'right',
+              }}
+            >
               {showPicker ? (
                 <EmojiPicker emojiStyle="native" onEmojiClick={onEmojiClick} />
               ) : null}
-              <Button size="xs" type="submit" style={{ marginRight: '0.5rem' }}>
+              <Button
+                mt="xs"
+                mb="xs"
+                size="xs"
+                type="submit"
+                style={{ marginRight: '1.2rem' }}
+              >
                 Send
               </Button>
             </Group>

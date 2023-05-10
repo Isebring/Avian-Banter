@@ -105,7 +105,7 @@ function LandingPage() {
             <img
               src="/avian-phone-upscaled.png"
               alt="Bird browsing a smartphone"
-              style={{ width: '100%', height: '100vh', objectFit: 'cover' }}
+              style={{ width: '100%', height: 'calc(100vh - 65px)', objectFit: 'cover' }}
             />
           </Box>
         </MediaQuery>
