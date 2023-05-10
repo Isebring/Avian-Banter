@@ -1,10 +1,11 @@
 export interface ServerToClientEvents {
-  systemMessage: (message: string) => void;
   message: (message: Message[]) => void;
+  systemMessage: (message: string) => void;
   rooms: (rooms: string[]) => void;
   messageHistory: (messages: Message[]) => void;
   session: (user: SocketData) => void;
   typing: (room: string, username: string) => void;
+  users: (users: SocketData[]) => void;
 }
 
 export interface ClientToServerEvents {

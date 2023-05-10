@@ -6,7 +6,7 @@ import {
   useState,
 } from 'react';
 import { io } from 'socket.io-client';
-import { Message } from '../../../server/communication';
+import { Message, SocketData } from '../../../server/communication';
 
 interface ContextValues {
   storeUsername: (username: string) => void;
@@ -16,6 +16,8 @@ interface ContextValues {
   rooms: string[];
   join: (room: string) => void;
   fetchMessageHistory: (room: string) => void;
+  users: SocketData[];
+  createDMRoom: (recipientUserID: string) => void;
 }
 export const socket = io({ autoConnect: false });
 
@@ -25,6 +27,7 @@ export const useSocket = () => useContext(SocketContext);
 function SocketProvider({ children }: PropsWithChildren) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [rooms, setRooms] = useState<string[]>([]);
+  const [users, setUsers] = useState<SocketData[]>([]);
 
   const storeUsername = (username: string) => {
     socket.auth = { username };
@@ -54,6 +57,16 @@ function SocketProvider({ children }: PropsWithChildren) {
     socket.emit('message', message, room);
   };
 
+  const createDMRoom = (recipientUserID: string) => {
+    if (recipientUserID) {
+      const currentUserID = users.find(
+        (user) => user.sessionID === socket.id
+      )?.userID;
+      const room = `dm-${currentUserID}-${recipientUserID}`;
+      socket.emit('createRoom', room);
+    }
+  };
+
   useEffect(() => {
     const onMessage = (message: Message) => {
       setMessages((prevMessages) => [...prevMessages, message]);
@@ -65,6 +78,19 @@ function SocketProvider({ children }: PropsWithChildren) {
       socket.off('message', onMessage);
     };
   }, [socket]);
+
+  useEffect(() => {
+    const onUsersUpdate = (users: SocketData[]) => {
+      setUsers(users);
+      console.log('socketContext users:', users);
+    };
+
+    socket.on('users', onUsersUpdate);
+
+    return () => {
+      socket.off('users', onUsersUpdate);
+    };
+  }, [socket, users]);
 
   useEffect(() => {
     function connect() {
@@ -112,6 +138,8 @@ function SocketProvider({ children }: PropsWithChildren) {
         rooms,
         join,
         fetchMessageHistory,
+        users,
+        createDMRoom,
       }}
     >
       {children}
