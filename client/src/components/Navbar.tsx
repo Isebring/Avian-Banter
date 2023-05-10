@@ -92,6 +92,9 @@ export function Navigationbar() {
   const { users, createDMRoom } = useSocket();
   const navigate = useNavigate();
 
+  const currentUserID = localStorage.getItem('sessionID');
+  const filteredUsers = users.filter((user) => user.userID !== currentUserID);
+
   function scrollToTop() {
     window.scrollTo({
       top: 0,
@@ -256,8 +259,8 @@ export function Navigationbar() {
         title="Messages"
         zIndex={1000000}
       >
-        {users &&
-          users.map((user: SocketData) => (
+        {filteredUsers &&
+          filteredUsers.map((user: SocketData) => (
             <div key={user.userID}>
               <Text>{user.username}</Text>
               <Button onClick={() => handleCreateDMRoom(user.userID)}>
