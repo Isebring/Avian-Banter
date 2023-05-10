@@ -38,7 +38,7 @@ export const UsernameProvider: React.FC<UsernameProviderProps> = ({
   }, []);
 
   useEffect(() => {
-    function handleSession({ sessionID, userID }: SocketData) {
+    function handleSession({ sessionID }: SocketData) {
       // attach the session ID to the next reconnection attempts
       socket.auth = { sessionID };
       // store it in the localStorage

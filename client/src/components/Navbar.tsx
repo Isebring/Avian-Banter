@@ -10,7 +10,7 @@ import {
   ScrollArea,
   Text,
   createStyles,
-  rem
+  rem,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import {
@@ -86,6 +86,7 @@ export function Navigationbar() {
   //   const [linksOpened, { toggle: toggleLinks }] = useDisclosure(false);
   const { classes, theme } = useStyles();
   const { username } = useUsername();
+  const sessionID = localStorage.getItem('sessionID');
 
   function scrollToTop() {
     window.scrollTo({
@@ -100,7 +101,7 @@ export function Navigationbar() {
     <Box sx={{ position: 'sticky', top: 0, left: 0, right: 0, zIndex: 1 }}>
       <Header height={65} px="md">
         <Group position="apart" sx={{ height: '100%' }}>
-          <Link onClick={scrollToTop} to="/">
+          {sessionID ? (
             <MediaQuery query="(max-width: 500px)" styles={{ width: '190px' }}>
               <img
                 src="/avian-banter-logo.svg"
@@ -109,7 +110,22 @@ export function Navigationbar() {
                 height="52px"
               />
             </MediaQuery>
-          </Link>
+          ) : (
+            <Link onClick={scrollToTop} to="/">
+              <MediaQuery
+                query="(max-width: 500px)"
+                styles={{ width: '190px' }}
+              >
+                <img
+                  src="/avian-banter-logo.svg"
+                  alt="AvianBanter logo"
+                  width="200px"
+                  height="52px"
+                />
+              </MediaQuery>
+            </Link>
+          )}
+
           <Group
             sx={{ height: '100%' }}
             spacing={0}
@@ -148,7 +164,7 @@ export function Navigationbar() {
               Messages
             </Button>
           </Group>
-      <Text>{username}</Text>
+          <Text>{username}</Text>
           <Group className={classes.hiddenMobile}></Group>
 
           <Burger
