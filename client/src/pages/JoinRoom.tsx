@@ -1,9 +1,27 @@
-import { Container, SimpleGrid, Title } from '@mantine/core';
+import { Button, Container, SimpleGrid, Title } from '@mantine/core';
+import { useNavigate } from 'react-router-dom';
 import RoomCard from '../components/RoomCard';
 import { useSocket } from '../context/SocketContext';
 
 function JoinRoom() {
   const { rooms } = useSocket();
+  const navigate = useNavigate();
+
+  if (rooms.length === 0) {
+    return (
+      <Container>
+        <Title align="center" mb="xl" order={2}>
+          No Active Rooms
+        </Title>
+        <SimpleGrid>
+          <p>
+            There are currently no active rooms. Would you like to create one?
+          </p>
+          <Button onClick={() => navigate('/createroom')}>Create Room</Button>
+        </SimpleGrid>
+      </Container>
+    );
+  }
 
   return (
     <Container>
