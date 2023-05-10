@@ -34,7 +34,7 @@ function ChatPage() {
   const handleInput = (e: React.FormEvent) => {
     e.preventDefault();
     if (inputMessage.trim() !== '' && room) {
-      sendMessage(room, inputMessage);
+      sendMessage({ username: sender, text: inputMessage }, room);
       setInputMessage('');
     }
   };
@@ -48,12 +48,9 @@ function ChatPage() {
       <Container>
         <Title>Welcome to room {room}</Title>
         {messages.map((message, index) => (
-          <Message
-            key={index}
-            message={{ text: message, sender: message }}
-            sender={sender}
-          />
+          <Message key={index} message={message} />
         ))}
+
         <form onSubmit={handleInput}>
           <Paper mt="xl" mb="lg" shadow="md">
             <Text size="xs" ml="lg" pt="xs" pb="xs">

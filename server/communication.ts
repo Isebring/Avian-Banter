@@ -1,13 +1,14 @@
 export interface ServerToClientEvents {
-  message: (message: string) => void;
+  systemMessage: (message: string) => void;
+  message: (message: Message[]) => void;
   rooms: (rooms: string[]) => void;
-  messageHistory: (messages: string[]) => void;
+  messageHistory: (messages: Message[]) => void;
   session: (user: SocketData) => void;
   typing: (username: string, isTyping: boolean) => void;
 }
 
 export interface ClientToServerEvents {
-  message: (message: string, room: string, username: string) => void;
+  message: (message: Message, room: string) => void;
   storeUsername: (username: string) => void;
   createRoom: (room: string) => void;
   join: (room: string) => void;
@@ -18,6 +19,11 @@ export interface ClientToServerEvents {
 
 export interface InterServerEvents {
   ping: () => void;
+}
+
+export interface Message {
+  text: string;
+  username: string;
 }
 
 export interface SocketData {

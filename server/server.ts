@@ -5,6 +5,7 @@ import { Server } from 'socket.io';
 import {
   ClientToServerEvents,
   InterServerEvents,
+  Message,
   ServerToClientEvents,
   SocketData,
 } from './communication';
@@ -80,7 +81,7 @@ const main = async () => {
 
   io.on('connection', (socket) => {
     console.log(`Client connected: ${socket.id}`);
-    socket.emit('message', 'Welcome to Avian Banter!');
+    socket.emit('systemMessage', 'Welcome to Avian Banter!');
 
     socket.emit('session', socket.data as SocketData);
 
@@ -96,10 +97,13 @@ const main = async () => {
       console.log(`Room created: ${room}`);
       socket.join(room);
       console.log(`${socket.data.username} joined room ${room}`);
-      socket.emit('message', `You have joined the room.`);
+      socket.emit('systemMessage', `You have joined the room.`);
       socket
         .to(room)
-        .emit('message', `User ${socket.data.username} has joined the room.`);
+        .emit(
+          'systemMessage',
+          `User ${socket.data.username} has joined the room.`
+        );
 
       io.emit('rooms', getRooms());
     });
@@ -112,22 +116,22 @@ const main = async () => {
 
       socket.emit(
         'messageHistory',
-        messageHistory.map((m) => m.message)
+        messageHistory.map((m) => ({ username: m.username, text: m.message }))
       );
     });
 
-    socket.on('message', async (message: string, room: string) => {
+    socket.on('message', async (message: Message, room: string) => {
       if (!message || !socket.data.username) return;
-      const formattedMessage = `${socket.data.username}: ${message}`;
 
       await messagesCollection.insertOne({
         room,
-        message: formattedMessage,
+        username: message.username,
+        message: message.text,
         createdAt: new Date(),
       });
 
-      socket.to(room).emit('message', formattedMessage);
-      socket.emit('message', formattedMessage);
+      socket.to(room).emit('message', [message]);
+      socket.emit('message', [message]);
     });
 
     socket.on('typing', (isTyping: boolean, room: string) => {
@@ -140,9 +144,12 @@ const main = async () => {
       console.log(`${socket.data.username} joined room ${room}`);
       socket
         .to(room)
-        .emit('message', `User ${socket.data.username} has joined the room.`);
+        .emit(
+          'systemMessage',
+          `User ${socket.data.username} has joined the room.`
+        );
 
-      socket.emit('message', `You have joined the room.`);
+      socket.emit('systemMessage', `You have joined the room.`);
 
       io.emit('rooms', getRooms());
     });
@@ -152,7 +159,10 @@ const main = async () => {
       socket.leave(room);
       socket
         .to(room)
-        .emit('message', `User ${socket.data.username} has left the room.`);
+        .emit(
+          'systemMessage',
+          `User ${socket.data.username} has left the room.`
+        );
     });
 
     socket.on('disconnect', () => {
