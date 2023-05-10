@@ -4,9 +4,9 @@
   "description": "A chat application built with Socket.io and React.",
   "main": "index.js",
   "scripts": {
-    "server": "cd server & npm run dev",
-    "client": "cd client & npm run dev",
-    "all": "npm run server & npm run client"
+    "server": "cd server && npm run dev",
+    "client": "cd client && npm run dev",
+    "dev": "concurrently \"npm run server\" \"npm run client\""
   },
   "repository": {
     "type": "git",
@@ -18,5 +18,8 @@
   "bugs": {
     "url": "https://github.com/Isebring/Avian-Banter/issues"
   },
-  "homepage": "https://github.com/Isebring/Avian-Banter#readme"
+  "homepage": "https://github.com/Isebring/Avian-Banter#readme",
+  "devDependencies": {
+    "concurrently": "^8.0.1"
+  }
 }
