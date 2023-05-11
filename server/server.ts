@@ -170,14 +170,15 @@ const main = async () => {
     socket.on('leave', (room) => {
       console.log(`${socket.data.username} left room ${room}`);
       socket.leave(room);
-      // socket
-      //   .to(room)
-      //   .emit(
-      //     'systemMessage',
-      //     `User ${socket.data.username} has left the room.`
-      //   );
-      // io.emit('rooms', getRooms());
+      io.emit('rooms', getRooms());
     });
+    // socket
+    //   .to(room)
+    //   .emit(
+    //     'systemMessage',
+    //     `User ${socket.data.username} has left the room.`
+    //   );
+    // io.emit('rooms', getRooms());
 
     // fångar alla leaves oavsett anledning
     // io.of('/').adapter.on('leave-room', (room, id) => {
