@@ -91,7 +91,7 @@ function ChatPage() {
   return (
     <Flex justify="center" align="center">
       <Container>
-        <Title mt="lg" mb="xl">
+        <Title order={2} mt="lg" mb="xl">
           Welcome to room {room}
         </Title>
         <Box
