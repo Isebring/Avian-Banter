@@ -17,29 +17,31 @@ function CreateRoomCard() {
   };
 
   return (
-    <Box
-      m="md"
-      sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'spaceBetween',
-      }}
-    >
-      <Input
-        miw="18rem"
-        mb="sm"
-        placeholder="Enter title of your room..."
-        value={title}
-        onChange={(event) => setTitle(event.currentTarget.value)}
-      ></Input>
-      <Button
-        miw="18rem"
-        leftIcon={<IconMessageChatbot />}
-        onClick={handleCreateRoom}
+    <form onSubmit={handleCreateRoom}>
+      <Box
+        m="md"
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'spaceBetween',
+        }}
       >
-        Create Room
-      </Button>
-    </Box>
+        <Input
+          miw="18rem"
+          mb="sm"
+          placeholder="Enter title of your room..."
+          value={title}
+          onChange={(event) => setTitle(event.currentTarget.value)}
+        ></Input>
+        <Button
+          miw="18rem"
+          leftIcon={<IconMessageChatbot />}
+          onClick={handleCreateRoom}
+        >
+          Create Room
+        </Button>
+      </Box>
+    </form>
   );
 }
 
