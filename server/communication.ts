@@ -40,8 +40,8 @@ export interface User {
   username: string;
 }
 
-interface DM {
-  roomID: string; // generate random string
-  userID1: string;
-  userID2: string;
-}
+// interface DM {
+//   roomID: string; // generate random string
+//   userID1: string;
+//   userID2: string;
+// }

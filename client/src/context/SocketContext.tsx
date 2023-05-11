@@ -78,7 +78,7 @@ function SocketProvider({ children }: PropsWithChildren) {
     return new Promise((resolve) => {
       if (recipientUserID && currentUserID) {
         const ids = [currentUserID, recipientUserID].sort();
-        let room = `${ids[0]}-${ids[1]}`;
+        let room = `dm-${ids[0]}-${ids[1]}`;
         socket.emit('createRoom', room);
         socket.once('roomCreated', (createdRoom) => {
           if (createdRoom === room) {

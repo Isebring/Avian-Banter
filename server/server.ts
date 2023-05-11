@@ -191,18 +191,15 @@ const main = async () => {
   function getRooms() {
     const { rooms } = io.sockets.adapter;
     const roomsFound: string[] = []; // Room[]
-
+    // Hämta sockets från setOfSocketIds och plocka ut socket.data....
     for (const [name, setOfSocketIds] of rooms) {
-      // Hämta sockets från setOfSocketIds och plocka ut socket.data....
       if (!setOfSocketIds.has(name)) {
-        if (name.includes('dm-')) continue;
         roomsFound.push(name);
       }
     }
 
     return roomsFound;
   }
-
   io.listen(3000);
   console.log('Connected and listening to port 3000');
 };
