@@ -13,6 +13,7 @@ import { IconMoodHappy } from '@tabler/icons-react';
 import EmojiPicker from 'emoji-picker-react';
 import { useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import { User } from '../../../server/communication';
 import Message from '../components/Message';
 import { socket, useSocket } from '../context/SocketContext';
 import { useUsername } from '../context/UsernameContext';
@@ -23,11 +24,8 @@ function ChatPage() {
   const [inputMessage, setInputMessage] = useState('');
   const [showPicker, setShowPicker] = useState(false);
   const { username } = useUsername();
-  const [typingUsers, setTypingUsers] = useState<string[]>([]);
+  const [typingUsers, setTypingUsers] = useState<User[]>([]);
   const [userIsTyping, setUserIsTyping] = useState(false);
-  const [userIdToUsername, setUserIdToUsername] = useState<{
-    [key: string]: string;
-  }>({});
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
@@ -37,29 +35,21 @@ function ChatPage() {
   }, [room, fetchMessageHistory]);
 
   useEffect(() => {
-    if (socket) {
-      socket.on('userTyping', (userId, isTyping, username) => {
-        if (userId !== socket.id) {
-          if (isTyping) {
-            setTypingUsers((users) => {
-              const newUserList = [...users, userId];
-              setUserIdToUsername((prevMapping) => ({
-                ...prevMapping,
-                [userId]: username,
-              }));
-              return newUserList;
-            });
-          } else {
-            setTypingUsers((users) => users.filter((user) => user !== userId));
-          }
-        }
-      });
+    const handleTyping = (isTyping: boolean, user: User) => {
+      if (isTyping) {
+        setTypingUsers((users) => [...users, user]);
+      } else {
+        setTypingUsers((users) =>
+          users.filter((u) => u.userID !== user.userID)
+        );
+      }
+    };
 
-      return () => {
-        socket.off('userTyping');
-      };
-    }
-  }, [socket]);
+    socket.on('typing', handleTyping);
+    return () => {
+      socket.off('typing', handleTyping);
+    };
+  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -78,33 +68,20 @@ function ChatPage() {
 
     if (isTyping && !userIsTyping) {
       setUserIsTyping(true);
-      socket.emit('typing', true, room, username);
+      socket.emit('typing', true, room!);
     }
 
     typingTimeoutRef.current = setTimeout(() => {
       if (userIsTyping) {
         setUserIsTyping(false);
-        socket.emit('typing', false, room, username);
+        socket.emit('typing', false, room!);
       }
     }, 2000);
   };
+
   const onEmojiClick = (emojiObject: any) => {
     setInputMessage((prevInput) => prevInput + emojiObject.emoji);
   };
-  useEffect(() => {
-    if (socket && userIsTyping !== typingUsers.includes(socket.id)) {
-      socket.emit('typing', userIsTyping, room, username); // <- Pass "username" as the third parameter
-    }
-  }, [socket, userIsTyping, room, typingUsers, username]); // <- Add "username" as a dependency
-
-  useEffect(() => {
-    if (socket && username) {
-      setUserIdToUsername((prevMapping) => ({
-        ...prevMapping,
-        [socket.id]: username,
-      }));
-    }
-  }, [socket, username]);
 
   return (
     <Flex justify="center" align="center">
@@ -116,14 +93,9 @@ function ChatPage() {
         {typingUsers.length > 0 && (
           <Text>
             {typingUsers.length > 1
-              ? typingUsers
-                  .map((id) =>
-                    id === socket.id ? username : userIdToUsername[id]
-                  )
-                  .join(', ') + ' are typing...'
-              : (typingUsers[0] === socket.id
-                  ? username
-                  : userIdToUsername[typingUsers[0]]) + ' is typing...'}
+              ? typingUsers.map((user) => user.username).join(', ') +
+                ' are typing...'
+              : typingUsers[0].username + ' is typing...'}
           </Text>
         )}
         <form onSubmit={handleSubmit}>

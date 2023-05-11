@@ -6,7 +6,11 @@ import {
   useState,
 } from 'react';
 import { Socket, io } from 'socket.io-client';
-import { Message } from '../../../server/communication';
+import {
+  ClientToServerEvents,
+  Message,
+  ServerToClientEvents,
+} from '../../../server/communication';
 
 interface ContextValues {
   storeUsername: (username: string) => void;
@@ -22,7 +26,9 @@ interface ContextValues {
   // typingUsers: { [key: string]: boolean };
 }
 
-export const socket: Socket = io({ autoConnect: false });
+export const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io({
+  autoConnect: false,
+});
 
 const SocketContext = createContext<ContextValues>(null as any);
 
@@ -58,9 +64,9 @@ function SocketProvider({ children }: PropsWithChildren) {
     }
   };
 
-  const sendMessage = (message: Message, room: string, eventType?: string) => {
+  const sendMessage = (message: Message, room: string) => {
     if (!room) throw Error("Can't send message without a room");
-    socket.emit(eventType || 'message', message, room);
+    socket.emit('message', message, room);
   };
 
   // const listenForTypingEvents = (
@@ -83,18 +89,6 @@ function SocketProvider({ children }: PropsWithChildren) {
   // };
 
   useEffect(() => {
-    const onMessage = (message: Message) => {
-      setMessages((prevMessages) => [...prevMessages, message]);
-    };
-
-    socket.on('message', onMessage);
-
-    return () => {
-      socket.off('message', onMessage);
-    };
-  }, [socket]);
-
-  useEffect(() => {
     function connect() {
       console.log('Connected to server');
     }
@@ -103,8 +97,8 @@ function SocketProvider({ children }: PropsWithChildren) {
       console.log('Disconnected from server');
     }
 
-    function message(message: string) {
-      console.log(message);
+    function message(message: Message) {
+      setMessages((prevMessages) => [...prevMessages, message]);
     }
 
     function rooms(rooms: string[]) {
@@ -128,7 +122,7 @@ function SocketProvider({ children }: PropsWithChildren) {
       socket.off('rooms', rooms);
       socket.off('messageHistory', messageHistory);
     };
-  }, [socket]);
+  }, []);
 
   return (
     <SocketContext.Provider
