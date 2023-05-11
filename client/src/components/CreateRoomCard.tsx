@@ -1,4 +1,4 @@
-import { Box, Button, Input, Text, Textarea } from '@mantine/core';
+import { Box, Button, Input } from '@mantine/core';
 import { IconMessageChatbot } from '@tabler/icons-react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -25,19 +25,13 @@ function CreateRoomCard() {
         justifyContent: 'spaceBetween',
       }}
     >
-      <Text my="md">Title</Text>
       <Input
         miw="18rem"
+        mb="sm"
         placeholder="Enter title of your room..."
         value={title}
         onChange={(event) => setTitle(event.currentTarget.value)}
       ></Input>
-      <Text my="md">Invite others</Text>
-      <Textarea
-        miw="18rem"
-        my="md"
-        placeholder="Invite a fellow bird to a private room"
-      ></Textarea>
       <Button
         miw="18rem"
         leftIcon={<IconMessageChatbot />}
