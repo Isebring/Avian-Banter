@@ -5,8 +5,12 @@ import {
   useEffect,
   useState,
 } from 'react';
-import { io } from 'socket.io-client';
-import { Message } from '../../../server/communication';
+import { Socket, io } from 'socket.io-client';
+import {
+  ClientToServerEvents,
+  Message,
+  ServerToClientEvents,
+} from '../../../server/communication';
 
 interface ContextValues {
   storeUsername: (username: string) => void;
@@ -16,15 +20,26 @@ interface ContextValues {
   rooms: string[];
   join: (room: string) => void;
   fetchMessageHistory: (room: string) => void;
+  // listenForTypingEvents: (
+  //   callback: (data: { username: string; isTyping: boolean }) => void
+  // ) => void;
+  // typingUsers: { [key: string]: boolean };
 }
-export const socket = io({ autoConnect: false });
+
+export const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io({
+  autoConnect: false,
+});
 
 const SocketContext = createContext<ContextValues>(null as any);
+
 export const useSocket = () => useContext(SocketContext);
 
 function SocketProvider({ children }: PropsWithChildren) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [rooms, setRooms] = useState<string[]>([]);
+  // const [typingUsers, setTypingUsers] = useState<{ [key: string]: boolean }>(
+  //   {}
+  // );
 
   const storeUsername = (username: string) => {
     socket.auth = { username };
@@ -54,17 +69,24 @@ function SocketProvider({ children }: PropsWithChildren) {
     socket.emit('message', message, room);
   };
 
-  useEffect(() => {
-    const onMessage = (message: Message) => {
-      setMessages((prevMessages) => [...prevMessages, message]);
-    };
-
-    socket.on('message', onMessage);
-
-    return () => {
-      socket.off('message', onMessage);
-    };
-  }, [socket]);
+  // const listenForTypingEvents = (
+  //   callback: (data: { username: string; isTyping: boolean }) => void
+  // ) => {
+  //   socket.on('typing', (data: { username: string }) => {
+  //     setTypingUsers((prevTypingUsers) => ({
+  //       ...prevTypingUsers,
+  //       [data.username]: true,
+  //     }));
+  //     callback({ username: data.username, isTyping: true });
+  //   });
+  //   socket.on('stop-typing', (data: { username: string }) => {
+  //     setTypingUsers((prevTypingUsers) => ({
+  //       ...prevTypingUsers,
+  //       [data.username]: false,
+  //     }));
+  //     callback({ username: data.username, isTyping: false });
+  //   });
+  // };
 
   useEffect(() => {
     function connect() {
@@ -75,8 +97,8 @@ function SocketProvider({ children }: PropsWithChildren) {
       console.log('Disconnected from server');
     }
 
-    function message(message: string) {
-      console.log(message);
+    function message(message: Message) {
+      setMessages((prevMessages) => [...prevMessages, message]);
     }
 
     function rooms(rooms: string[]) {
@@ -100,7 +122,7 @@ function SocketProvider({ children }: PropsWithChildren) {
       socket.off('rooms', rooms);
       socket.off('messageHistory', messageHistory);
     };
-  }, [socket]);
+  }, []);
 
   return (
     <SocketContext.Provider
@@ -112,6 +134,8 @@ function SocketProvider({ children }: PropsWithChildren) {
         rooms,
         join,
         fetchMessageHistory,
+        // listenForTypingEvents,
+        // typingUsers,
       }}
     >
       {children}
