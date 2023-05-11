@@ -23,11 +23,13 @@ function Message({ message }: MessageProps) {
           borderRadius: '1rem',
           padding: '0.5rem 1rem',
           marginBottom: '0.5rem',
-          maxWidth: '18rem',
+          maxWidth: '50%',
+          margin: '0.5rem',
         }}
       >
-        <Text>
-          {message.username}: {message.text}
+        <Text fw={600}>{message.username}</Text>
+        <Text style={{ whiteSpace: 'normal', wordWrap: 'break-word' }}>
+          {message.text}
         </Text>
       </Card>
     </Box>

@@ -2,7 +2,6 @@ import {
   Box,
   Button,
   Container,
-  Flex,
   Group,
   Input,
   Paper,
@@ -27,6 +26,7 @@ function ChatPage() {
   const [typingUsers, setTypingUsers] = useState<User[]>([]);
   const [userIsTyping, setUserIsTyping] = useState(false);
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (room) {
@@ -83,53 +83,64 @@ function ChatPage() {
     setInputMessage((prevInput) => prevInput + emojiObject.emoji);
   };
 
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages.length]);
+
   return (
-    <Flex justify="center" align="center">
-      <Container>
-        <Title>Welcome to room {room}</Title>
+    <Container size="sm">
+      <Title order={2} align="center" mt="lg" mb="xl">
+        Welcome to room {room}
+      </Title>
+      <Box
+        sx={{
+          maxHeight: '500px',
+          overflowY: 'scroll',
+          pb: '90px', // Height of the form
+        }}
+      >
         {messages.map((message, index) => (
           <Message key={index} message={message} />
         ))}
-        {typingUsers.length > 0 && (
-          <Text>
+        <div ref={messagesEndRef} />
+      </Box>
+      <Box sx={{ height: '0.5rem' }}>
+        {typingUsers.length > 0 ? (
+          <Text size="sm">
             {typingUsers.length > 1
               ? typingUsers.map((user) => user.username).join(', ') +
                 ' are typing...'
               : typingUsers[0].username + ' is typing...'}
           </Text>
-        )}
-        <form onSubmit={handleSubmit}>
+        ) : null}
+      </Box>
+
+      <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+        <form style={{ width: '20rem' }} onSubmit={handleSubmit}>
           <Paper mt="xl" mb="lg" shadow="md">
             <Text size="xs" ml="lg" pt="xs" pb="xs">
               {username}
             </Text>
-            <Box sx={{ position: 'relative' }}>
-              <Input
-                ml="lg"
-                mr="lg"
-                value={inputMessage}
-                onChange={onInputChange}
-                placeholder="Type a message..."
-              />
-              <Button
-                variant="hidden"
-                onClick={() => setShowPicker(!showPicker)}
-                sx={{
-                  position: 'absolute',
-                  top: 0,
-                  right: 5,
-                  width: 'auto',
-                }}
-              >
-                <IconMoodHappy stroke={0.7} />
-              </Button>
-            </Box>
+
+            <Input
+              ml="lg"
+              mr="lg"
+              value={inputMessage}
+              onChange={onInputChange}
+              placeholder="Type a message..."
+            />
             <Group
               sx={{
                 display: 'flex',
-                justifyContent: 'right',
+                justifyContent: 'space-between',
               }}
             >
+              <Button
+                variant="hidden"
+                onClick={() => setShowPicker(!showPicker)}
+              >
+                <IconMoodHappy stroke={0.7} />
+              </Button>
               {showPicker ? (
                 <EmojiPicker emojiStyle="native" onEmojiClick={onEmojiClick} />
               ) : null}
@@ -145,8 +156,8 @@ function ChatPage() {
             </Group>
           </Paper>
         </form>
-      </Container>
-    </Flex>
+      </Box>
+    </Container>
   );
 }
 

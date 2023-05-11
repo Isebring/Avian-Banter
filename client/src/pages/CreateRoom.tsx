@@ -7,16 +7,20 @@ function CreateRoom() {
     <Container
       sx={{
         display: 'flex',
-        height: 'calc(100vh - 65px)',
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
       }}
     >
-      <Title align="center" order={2}>
+      <Title align="center" mt="lg" order={2}>
         Create a room
       </Title>
       <CreateRoomCard />
+      <img
+        src="/avian-createroom.png"
+        alt="Bird browsing a smartphone"
+        width={300}
+      />
     </Container>
   );
 }
