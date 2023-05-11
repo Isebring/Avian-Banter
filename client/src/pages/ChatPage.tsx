@@ -92,7 +92,7 @@ function ChatPage() {
 
   return (
     <Container size="sm">
-      <Title order={2} mt="lg" mb="xl">
+      <Title order={2} align="center" mt="lg" mb="xl">
         {hasMoreThanSixDigits
           ? 'Welcome to the direct message room'
           : 'Welcome to room' + ' ' + room}
