@@ -20,6 +20,7 @@ interface ContextValues {
   messages: Message[];
   rooms: string[];
   join: (room: string) => void;
+  leave: (room: string) => void;
   fetchMessageHistory: (room: string) => void;
   users: SocketData[];
   createDMRoom: (recipientUserID: string) => Promise<string | null>;
@@ -52,6 +53,11 @@ function SocketProvider({ children }: PropsWithChildren) {
   const join = (room: string) => {
     if (room) {
       socket.emit('join', room);
+    }
+  };
+  const leave = (room: string) => {
+    if (room) {
+      socket.emit('leave', room);
     }
   };
 
@@ -156,6 +162,7 @@ function SocketProvider({ children }: PropsWithChildren) {
         createRoom,
         rooms,
         join,
+        leave,
         fetchMessageHistory,
         users,
         createDMRoom,

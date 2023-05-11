@@ -80,7 +80,7 @@ const main = async () => {
   });
 
   io.on('connection', async (socket) => {
-    console.log(`Client connected: ${socket.id}`);
+    console.log(`Client connected: ${socket.data.username}`);
     const users = await sessionsCollection.find({}).toArray();
     io.emit('users', users);
     console.log('Connected users:', users);
@@ -147,6 +147,12 @@ const main = async () => {
 
     socket.on('join', (room) => {
       // Leave room if already joined
+      if (socket.data.room) {
+        console.log('data room:' + socket.data.room);
+        console.log(`${socket.data.username} left room ${socket.data.room}`);
+        socket.leave(socket.data.room);
+      }
+
       socket.join(room);
       console.log(`${socket.data.username} joined room ${room}`);
       socket
