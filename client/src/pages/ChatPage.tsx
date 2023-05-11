@@ -89,7 +89,7 @@ function ChatPage() {
   return (
     <Flex justify="center" align="center">
       <Container>
-        <Title>
+        <Title order={2} mt="lg" mb="xl">
           {hasMoreThanSixDigits
             ? 'Welcome to the direct message room'
             : 'Welcome to room' + ' ' + room}

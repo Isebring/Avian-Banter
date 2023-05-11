@@ -108,6 +108,8 @@ export function Navigationbar() {
     const room = await createDMRoom(recipientUserID);
     if (room) {
       navigate(`dm/${room}`);
+      closeMessagesDrawer();
+      closeDrawer();
     }
   };
 
@@ -198,12 +200,6 @@ export function Navigationbar() {
         className={classes.hiddenDesktop}
         zIndex={1000000}
       >
-        {/* <Link
-          onClick={scrollToTop}
-          style={{ textDecoration: 'none' }}
-          to="/profile"
-        ></Link> */}
-
         <ScrollArea h={`calc(100vh - ${rem(60)})`} mx="-md">
           <Divider
             my="lg"
@@ -256,18 +252,23 @@ export function Navigationbar() {
         opened={messagesDrawerOpened}
         onClose={closeMessagesDrawer}
         position="right"
-        size="40%"
+        size="40rem"
         padding="md"
         title="Messages"
         zIndex={1000000}
       >
+        <Divider mb="sm" />
         {filteredUsers &&
           filteredUsers.map((user: SocketData) => (
             <div key={user.userID}>
-              <Text>{user.username}</Text>
+              <Text sx={{ marginBottom: '0.3rem' }} mt="xs">
+                {user.username}
+              </Text>
               <Button onClick={() => handleCreateDMRoom(user.userID)}>
                 Send Direct Message
               </Button>
+
+              <Divider mt="md" />
             </div>
           ))}
       </Drawer>
