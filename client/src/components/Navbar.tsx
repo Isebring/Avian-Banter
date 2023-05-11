@@ -251,6 +251,8 @@ export function Navigationbar() {
         title="Messages"
         zIndex={1000000}
       >
+        <Divider />
+
         {/* Add your messages-related content here */}
       </Drawer>
     </Box>
