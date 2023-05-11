@@ -83,10 +83,17 @@ function ChatPage() {
     setInputMessage((prevInput) => prevInput + emojiObject.emoji);
   };
 
+  const roomDigits = room!.replace(/\D/g, ''); // Remove non-digits from room string
+  const hasMoreThanSixDigits = roomDigits.length > 6;
+
   return (
     <Flex justify="center" align="center">
       <Container>
-        <Title>Welcome to room {room}</Title>
+        <Title>
+          {hasMoreThanSixDigits
+            ? 'Welcome to the direct message room'
+            : 'Welcome to room' + ' ' + room}
+        </Title>
         {messages.map((message, index) => (
           <Message key={index} message={message} />
         ))}
