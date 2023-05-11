@@ -110,14 +110,14 @@ function ChatPage() {
         <div ref={messagesEndRef} />
       </Box>
       <Box sx={{ height: '0.5rem' }}>
-        {typingUsers.length > 0 ? (
+        {typingUsers.length > 0 && (
           <Text size="sm">
             {typingUsers.length > 1
               ? typingUsers.map((user) => user.username).join(', ') +
                 ' are typing...'
               : typingUsers[0].username + ' is typing...'}
           </Text>
-        ) : null}
+        )}
       </Box>
 
       <Box sx={{ display: 'flex', justifyContent: 'center' }}>
