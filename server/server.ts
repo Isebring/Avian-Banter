@@ -8,6 +8,7 @@ import {
   Message,
   ServerToClientEvents,
   SocketData,
+  User,
 } from './communication';
 
 dotenv.config();
@@ -132,15 +133,20 @@ const main = async () => {
         createdAt: new Date(),
       });
 
-      socket.to(room).emit('message', [message]);
-      socket.emit('message', [message]);
+      socket.to(room).emit('message', message);
+      socket.emit('message', message);
     });
 
-    socket.on('typing', (room: string) => {
-      socket.to(room).emit('typing', room, socket.data.username!);
+    socket.on('typing', (isTyping: boolean, room: string) => {
+      console.log(`${socket.data.username} is typing in room ${room}`);
+      socket.broadcast.to(room).emit('typing', isTyping, {
+        username: socket.data.username!,
+        userID: socket.data.userID!,
+      });
     });
 
     socket.on('join', (room) => {
+      // Leave room if already joined
       socket.join(room);
       console.log(`${socket.data.username} joined room ${room}`);
       socket
@@ -158,6 +164,10 @@ const main = async () => {
     socket.on('leave', (room) => {
       console.log(`${socket.data.username} left room ${room}`);
       socket.leave(room);
+    });
+
+    // fångar alla leaves oavsett anledning
+    io.of('/').adapter.on('leave-room', (room, id) => {
       socket
         .to(room)
         .emit(
@@ -174,10 +184,12 @@ const main = async () => {
 
   function getRooms() {
     const { rooms } = io.sockets.adapter;
-    const roomsFound: string[] = [];
+    const roomsFound: string[] = []; // Room[]
 
     for (const [name, setOfSocketIds] of rooms) {
+      // Hämta sockets från setOfSocketIds och plocka ut socket.data....
       if (!setOfSocketIds.has(name)) {
+        if (name.includes('dm-')) continue;
         roomsFound.push(name);
       }
     }
@@ -190,3 +202,8 @@ const main = async () => {
 };
 
 main();
+
+interface Room {
+  name: string;
+  users: User[];
+}

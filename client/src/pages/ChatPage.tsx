@@ -11,10 +11,11 @@ import {
 } from '@mantine/core';
 import { IconMoodHappy } from '@tabler/icons-react';
 import EmojiPicker from 'emoji-picker-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import { User } from '../../../server/communication';
 import Message from '../components/Message';
-import { useSocket } from '../context/SocketContext';
+import { socket, useSocket } from '../context/SocketContext';
 import { useUsername } from '../context/UsernameContext';
 
 function ChatPage() {
@@ -23,7 +24,9 @@ function ChatPage() {
   const [inputMessage, setInputMessage] = useState('');
   const [showPicker, setShowPicker] = useState(false);
   const { username } = useUsername();
-  const sender = username || 'Anonymous';
+  const [typingUsers, setTypingUsers] = useState<User[]>([]);
+  const [userIsTyping, setUserIsTyping] = useState(false);
+  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     if (room) {
@@ -31,12 +34,49 @@ function ChatPage() {
     }
   }, [room, fetchMessageHistory]);
 
-  const handleInput = (e: React.FormEvent) => {
+  useEffect(() => {
+    const handleTyping = (isTyping: boolean, user: User) => {
+      if (isTyping) {
+        setTypingUsers((users) => [...users, user]);
+      } else {
+        setTypingUsers((users) =>
+          users.filter((u) => u.userID !== user.userID)
+        );
+      }
+    };
+
+    socket.on('typing', handleTyping);
+    return () => {
+      socket.off('typing', handleTyping);
+    };
+  }, []);
+
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (inputMessage.trim() !== '' && room) {
-      sendMessage({ username: sender, text: inputMessage }, room);
+      sendMessage({ username: username, text: inputMessage }, room);
       setInputMessage('');
     }
+  };
+  const onInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setInputMessage(event.target.value);
+    const isTyping = event.target.value.trim() !== '';
+
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current);
+    }
+
+    if (isTyping && !userIsTyping) {
+      setUserIsTyping(true);
+      socket.emit('typing', true, room!);
+    }
+
+    typingTimeoutRef.current = setTimeout(() => {
+      if (userIsTyping) {
+        setUserIsTyping(false);
+        socket.emit('typing', false, room!);
+      }
+    }, 2000);
   };
 
   const onEmojiClick = (emojiObject: any) => {
@@ -50,8 +90,15 @@ function ChatPage() {
         {messages.map((message, index) => (
           <Message key={index} message={message} />
         ))}
-
-        <form onSubmit={handleInput}>
+        {typingUsers.length > 0 && (
+          <Text>
+            {typingUsers.length > 1
+              ? typingUsers.map((user) => user.username).join(', ') +
+                ' are typing...'
+              : typingUsers[0].username + ' is typing...'}
+          </Text>
+        )}
+        <form onSubmit={handleSubmit}>
           <Paper mt="xl" mb="lg" shadow="md">
             <Text size="xs" ml="lg" pt="xs" pb="xs">
               {username}
@@ -61,7 +108,7 @@ function ChatPage() {
                 ml="lg"
                 mr="lg"
                 value={inputMessage}
-                onChange={(event) => setInputMessage(event.currentTarget.value)}
+                onChange={onInputChange}
                 placeholder="Type a message..."
               />
               <Button

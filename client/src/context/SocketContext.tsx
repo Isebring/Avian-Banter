@@ -5,8 +5,13 @@ import {
   useEffect,
   useState,
 } from 'react';
-import { io } from 'socket.io-client';
-import { Message, SocketData } from '../../../server/communication';
+import { Socket, io } from 'socket.io-client';
+import {
+  ClientToServerEvents,
+  Message,
+  ServerToClientEvents,
+  SocketData,
+} from '../../../server/communication';
 
 interface ContextValues {
   storeUsername: (username: string) => void;
@@ -19,9 +24,13 @@ interface ContextValues {
   users: SocketData[];
   createDMRoom: (recipientUserID: string) => Promise<string | null>;
 }
-export const socket = io({ autoConnect: false });
+
+export const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io({
+  autoConnect: false,
+});
 
 const SocketContext = createContext<ContextValues>(null as any);
+
 export const useSocket = () => useContext(SocketContext);
 
 function SocketProvider({ children }: PropsWithChildren) {
@@ -111,8 +120,8 @@ function SocketProvider({ children }: PropsWithChildren) {
       console.log('Disconnected from server');
     }
 
-    function message(message: string) {
-      console.log(message);
+    function message(message: Message) {
+      setMessages((prevMessages) => [...prevMessages, message]);
     }
 
     function rooms(rooms: string[]) {
@@ -136,7 +145,7 @@ function SocketProvider({ children }: PropsWithChildren) {
       socket.off('rooms', rooms);
       socket.off('messageHistory', messageHistory);
     };
-  }, [socket]);
+  }, []);
 
   return (
     <SocketContext.Provider
