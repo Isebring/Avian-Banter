@@ -27,12 +27,17 @@ function ChatPage() {
   const [typingUsers, setTypingUsers] = useState<User[]>([]);
   const [userIsTyping, setUserIsTyping] = useState(false);
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (room) {
       fetchMessageHistory(room);
     }
   }, [room, fetchMessageHistory]);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
 
   useEffect(() => {
     const handleTyping = (isTyping: boolean, user: User) => {
@@ -90,6 +95,7 @@ function ChatPage() {
         {messages.map((message, index) => (
           <Message key={index} message={message} />
         ))}
+        <div ref={messagesEndRef} />
         {typingUsers.length > 0 && (
           <Text>
             {typingUsers.length > 1
