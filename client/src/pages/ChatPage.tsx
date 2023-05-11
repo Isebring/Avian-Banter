@@ -11,7 +11,7 @@ import {
 import { IconMoodHappy } from '@tabler/icons-react';
 import EmojiPicker from 'emoji-picker-react';
 import { useEffect, useRef, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { User } from '../../../server/communication';
 import Message from '../components/Message';
 import { socket, useSocket } from '../context/SocketContext';
@@ -19,7 +19,7 @@ import { useUsername } from '../context/UsernameContext';
 
 function ChatPage() {
   const { room } = useParams<{ room: string }>();
-  const { sendMessage, messages, fetchMessageHistory } = useSocket();
+  const { sendMessage, messages, fetchMessageHistory, leave } = useSocket();
   const [inputMessage, setInputMessage] = useState('');
   const [showPicker, setShowPicker] = useState(false);
   const { username } = useUsername();
@@ -27,6 +27,7 @@ function ChatPage() {
   const [userIsTyping, setUserIsTyping] = useState(false);
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (room) {
@@ -58,6 +59,14 @@ function ChatPage() {
       setInputMessage('');
     }
   };
+
+  const handleLeaveRoom = () => {
+    if (room) {
+      leave(room);
+      navigate('/joinroom');
+    }
+  };
+
   const onInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setInputMessage(event.target.value);
     const isTyping = event.target.value.trim() !== '';
@@ -162,6 +171,16 @@ function ChatPage() {
           </Paper>
         </form>
       </Box>
+      <Button
+        mt="xs"
+        mb="xs"
+        size="xs"
+        type="submit"
+        style={{ marginRight: '1.2rem' }}
+        onClick={handleLeaveRoom}
+      >
+        Leave Room
+      </Button>
     </Container>
   );
 }
