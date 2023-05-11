@@ -81,7 +81,7 @@ const main = async () => {
   io.on('connection', async (socket) => {
     console.log(`Client connected: ${socket.id}`);
     const users = await sessionsCollection.find({}).toArray();
-    socket.emit('users', users);
+    io.emit('users', users);
     console.log('Connected users:', users);
 
     socket.emit('systemMessage', 'Welcome to Avian Banter!');
@@ -165,9 +165,8 @@ const main = async () => {
           `User ${socket.data.username} has left the room.`
         );
     });
-
     socket.on('disconnect', () => {
-      console.log(`Client disconnected: ${socket.id}`);
+      console.log(`Client disconnected: ${socket.data.username}`);
     });
 
     io.emit('rooms', getRooms());
