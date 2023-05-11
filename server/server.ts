@@ -170,6 +170,13 @@ const main = async () => {
     socket.on('leave', (room) => {
       console.log(`${socket.data.username} left room ${room}`);
       socket.leave(room);
+      socket
+        .to(room)
+        .emit(
+          'systemMessage',
+          `User ${socket.data.username} has left the room.`
+        );
+      io.emit('rooms', getRooms());
     });
 
     // fångar alla leaves oavsett anledning
@@ -180,6 +187,14 @@ const main = async () => {
           'systemMessage',
           `User ${socket.data.username} has left the room.`
         );
+      io.emit('rooms', getRooms());
+
+      process.nextTick(() => {
+        const rooms = io.sockets.adapter.rooms;
+        if (!rooms.get(room)) {
+          console.log(`Room ${room} has been removed`);
+        }
+      });
     });
     socket.on('disconnect', () => {
       console.log(`Client disconnected: ${socket.data.username}`);
