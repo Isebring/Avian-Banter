@@ -36,10 +36,6 @@ function ChatPage() {
   }, [room, fetchMessageHistory]);
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
-
-  useEffect(() => {
     const handleTyping = (isTyping: boolean, user: User) => {
       if (isTyping) {
         setTypingUsers((users) => [...users, user]);
@@ -88,16 +84,30 @@ function ChatPage() {
     setInputMessage((prevInput) => prevInput + emojiObject.emoji);
   };
 
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages.length]);
+
   return (
     <Flex justify="center" align="center">
       <Container>
-        <Title>Welcome to room {room}</Title>
-        {messages.map((message, index) => (
-          <Message key={index} message={message} />
-        ))}
-        <div ref={messagesEndRef} />
+        <Title mt="lg" mb="xl">
+          Welcome to room {room}
+        </Title>
+        <Box
+          sx={{
+            maxHeight: '500px',
+            overflowY: 'scroll',
+            pb: '90px', // Height of the form
+          }}
+        >
+          {messages.map((message, index) => (
+            <Message key={index} message={message} />
+          ))}
+          <div ref={messagesEndRef} />
+        </Box>
         {typingUsers.length > 0 && (
-          <Text>
+          <Text size="xs">
             {typingUsers.length > 1
               ? typingUsers.map((user) => user.username).join(', ') +
                 ' are typing...'
