@@ -34,7 +34,6 @@ export const UsernameProvider: React.FC<UsernameProviderProps> = ({
     const sessionID = localStorage.getItem('sessionID');
 
     if (sessionID) {
-      // Navigera till rummen
       socket.auth = { sessionID };
       socket.connect();
     }

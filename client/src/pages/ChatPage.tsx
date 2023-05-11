@@ -83,7 +83,7 @@ function ChatPage() {
     setInputMessage((prevInput) => prevInput + emojiObject.emoji);
   };
 
-  const roomDigits = room!.replace(/\D/g, ''); // Remove non-digits from room string
+  const roomDigits = room!.replace(/\D/g, '');
   const hasMoreThanSixDigits = roomDigits.length > 6;
 
   return (
