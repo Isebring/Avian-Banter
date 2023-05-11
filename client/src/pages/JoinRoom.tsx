@@ -25,7 +25,7 @@ function JoinRoom() {
 
   return (
     <Container>
-      <Title align="center" mb="xl" order={2}>
+      <Title align="center" mt="lg" mb="xl" order={2}>
         Current Active Rooms
       </Title>
       <SimpleGrid
