@@ -180,8 +180,10 @@ export function Navigationbar() {
               Messages
             </Button>
           </Group>
-          <Text>{username}</Text>
-          <Group className={classes.hiddenMobile}></Group>
+
+          <Group className={classes.hiddenMobile}>
+            <Text>{username}</Text>
+          </Group>
 
           <Burger
             opened={drawerOpened}
@@ -245,6 +247,8 @@ export function Navigationbar() {
             my="lg"
             color={theme.colorScheme === 'dark' ? 'dark.5' : 'gray.1'}
           />
+          <Text ml="md">{username}</Text>
+
           <Group position="center" grow pb="xl" px="md"></Group>
         </ScrollArea>
       </Drawer>

@@ -11,23 +11,33 @@ function JoinRoom() {
 
   if (regularRooms.length === 0) {
     return (
-      <Container>
-        <Title align="center" mb="xl" order={2}>
+      <Container
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <Title align="center" mt="lg" order={2}>
           No Active Rooms
         </Title>
-        <SimpleGrid>
-          <p>
-            There are currently no active rooms. Would you like to create one?
-          </p>
-          <Button onClick={() => navigate('/createroom')}>Create Room</Button>
-        </SimpleGrid>
+        <p>
+          There are currently no active rooms. Would you like to create one?
+        </p>
+        <Button onClick={() => navigate('/createroom')}>Create Room</Button>
+        <img
+          src="/avian-confused.png"
+          alt="Bird browsing a smartphone"
+          width={300}
+        />
       </Container>
     );
   }
 
   return (
     <Container>
-      <Title align="center" mb="xl" order={2}>
+      <Title align="center" mt="lg" mb="xl" order={2}>
         Current Active Rooms
       </Title>
       <SimpleGrid
