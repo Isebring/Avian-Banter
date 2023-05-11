@@ -17,7 +17,7 @@ function JoinRoom() {
           justifyContent: 'center',
         }}
       >
-        <Title align="center" mb="xl" mt="lg" order={2}>
+        <Title align="center" mt="lg" order={2}>
           No Active Rooms
         </Title>
         <p>
