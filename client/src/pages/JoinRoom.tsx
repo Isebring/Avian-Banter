@@ -7,7 +7,9 @@ function JoinRoom() {
   const { rooms } = useSocket();
   const navigate = useNavigate();
 
-  if (rooms.length === 0) {
+  const regularRooms = rooms.filter((room) => !room.startsWith('dm-'));
+
+  if (regularRooms.length === 0) {
     return (
       <Container
         sx={{
@@ -47,7 +49,7 @@ function JoinRoom() {
           { maxWidth: '50rem', cols: 1 },
         ]}
       >
-        {rooms.map((room) => (
+        {regularRooms.map((room) => (
           <RoomCard key={room} roomName={room} />
         ))}
       </SimpleGrid>

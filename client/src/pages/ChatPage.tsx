@@ -87,10 +87,15 @@ function ChatPage() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages.length]);
 
+  const roomDigits = room!.replace(/\D/g, '');
+  const hasMoreThanSixDigits = roomDigits.length > 6;
+
   return (
     <Container size="sm">
-      <Title order={2} align="center" mt="lg" mb="xl">
-        Welcome to room {room}
+      <Title order={2} mt="lg" mb="xl">
+        {hasMoreThanSixDigits
+          ? 'Welcome to the direct message room'
+          : 'Welcome to room' + ' ' + room}
       </Title>
       <Box
         sx={{

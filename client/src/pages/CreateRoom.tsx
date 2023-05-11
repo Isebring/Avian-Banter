@@ -1,4 +1,3 @@
-// CreateRoom.js
 import { Container, Title } from '@mantine/core';
 import CreateRoomCard from '../components/CreateRoomCard';
 

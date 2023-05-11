@@ -22,6 +22,7 @@ const router = createBrowserRouter(
       <Route path="/joinroom" element={<JoinRoom />} />
       <Route path="/createroom" element={<CreateRoom />} />
       <Route path="/room/:room" element={<ChatPage />} />
+      <Route path="/dm/:room" element={<ChatPage />} />
     </Route>
   )
 );
@@ -30,8 +31,8 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
     <MantineProvider withGlobalStyles withNormalizeCSS>
       <SocketProvider>
-      <UsernameProvider>
-        <RouterProvider router={router} />
+        <UsernameProvider>
+          <RouterProvider router={router} />
         </UsernameProvider>
       </SocketProvider>
     </MantineProvider>

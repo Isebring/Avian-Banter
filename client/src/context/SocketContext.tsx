@@ -10,6 +10,7 @@ import {
   ClientToServerEvents,
   Message,
   ServerToClientEvents,
+  SocketData,
 } from '../../../server/communication';
 
 interface ContextValues {
@@ -19,11 +20,10 @@ interface ContextValues {
   messages: Message[];
   rooms: string[];
   join: (room: string) => void;
+  leave: (room: string) => void;
   fetchMessageHistory: (room: string) => void;
-  // listenForTypingEvents: (
-  //   callback: (data: { username: string; isTyping: boolean }) => void
-  // ) => void;
-  // typingUsers: { [key: string]: boolean };
+  users: SocketData[];
+  createDMRoom: (recipientUserID: string) => Promise<string | null>;
 }
 
 export const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io({
@@ -37,9 +37,7 @@ export const useSocket = () => useContext(SocketContext);
 function SocketProvider({ children }: PropsWithChildren) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [rooms, setRooms] = useState<string[]>([]);
-  // const [typingUsers, setTypingUsers] = useState<{ [key: string]: boolean }>(
-  //   {}
-  // );
+  const [users, setUsers] = useState<SocketData[]>([]);
 
   const storeUsername = (username: string) => {
     socket.auth = { username };
@@ -57,6 +55,11 @@ function SocketProvider({ children }: PropsWithChildren) {
       socket.emit('join', room);
     }
   };
+  const leave = (room: string) => {
+    if (room) {
+      socket.emit('leave', room);
+    }
+  };
 
   const fetchMessageHistory = (room: string) => {
     if (room) {
@@ -69,24 +72,50 @@ function SocketProvider({ children }: PropsWithChildren) {
     socket.emit('message', message, room);
   };
 
-  // const listenForTypingEvents = (
-  //   callback: (data: { username: string; isTyping: boolean }) => void
-  // ) => {
-  //   socket.on('typing', (data: { username: string }) => {
-  //     setTypingUsers((prevTypingUsers) => ({
-  //       ...prevTypingUsers,
-  //       [data.username]: true,
-  //     }));
-  //     callback({ username: data.username, isTyping: true });
-  //   });
-  //   socket.on('stop-typing', (data: { username: string }) => {
-  //     setTypingUsers((prevTypingUsers) => ({
-  //       ...prevTypingUsers,
-  //       [data.username]: false,
-  //     }));
-  //     callback({ username: data.username, isTyping: false });
-  //   });
-  // };
+  const createDMRoom = (recipientUserID: string): Promise<string | null> => {
+    const currentUserID = localStorage.getItem('userID');
+    console.log(users);
+    return new Promise((resolve) => {
+      if (recipientUserID && currentUserID) {
+        const ids = [currentUserID, recipientUserID].sort();
+        let room = `dm-${ids[0]}-${ids[1]}`;
+        socket.emit('createRoom', room);
+        socket.once('roomCreated', (createdRoom) => {
+          if (createdRoom === room) {
+            resolve(room);
+          }
+        });
+      } else {
+        console.error('Recipient or current user not found');
+        resolve(null);
+      }
+    });
+  };
+
+  useEffect(() => {
+    const onMessage = (message: Message) => {
+      setMessages((prevMessages) => [...prevMessages, message]);
+    };
+
+    socket.on('message', onMessage);
+
+    return () => {
+      socket.off('message', onMessage);
+    };
+  }, [socket]);
+
+  useEffect(() => {
+    const onUsersUpdate = (users: SocketData[]) => {
+      setUsers(users);
+      console.log('socketContext users:', users);
+    };
+
+    socket.on('users', onUsersUpdate);
+
+    return () => {
+      socket.off('users', onUsersUpdate);
+    };
+  }, [socket]);
 
   useEffect(() => {
     function connect() {
@@ -133,9 +162,10 @@ function SocketProvider({ children }: PropsWithChildren) {
         createRoom,
         rooms,
         join,
+        leave,
         fetchMessageHistory,
-        // listenForTypingEvents,
-        // typingUsers,
+        users,
+        createDMRoom,
       }}
     >
       {children}

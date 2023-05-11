@@ -50,7 +50,6 @@ const main = async () => {
     })
   );
 
-  const usersCollection = mongoClient.db(DB).collection('users');
   const sessionsCollection = mongoClient
     .db(DB)
     .collection<SocketData>('sessions');
@@ -80,8 +79,12 @@ const main = async () => {
     next();
   });
 
-  io.on('connection', (socket) => {
-    console.log(`Client connected: ${socket.id}`);
+  io.on('connection', async (socket) => {
+    console.log(`Client connected: ${socket.data.username}`);
+    const users = await sessionsCollection.find({}).toArray();
+    io.emit('users', users);
+    console.log('Connected users:', users);
+
     socket.emit('systemMessage', 'Welcome to Avian Banter!');
 
     socket.emit('session', socket.data as SocketData);
@@ -89,7 +92,6 @@ const main = async () => {
     socket.on('storeUsername', async (username: string) => {
       socket.data.username = username;
 
-      await usersCollection.insertOne({ username });
       console.log(`Username stored: ${username}`);
     });
 
@@ -105,8 +107,8 @@ const main = async () => {
           'systemMessage',
           `User ${socket.data.username} has joined the room.`
         );
-
       io.emit('rooms', getRooms());
+      socket.emit('roomCreated', room);
     });
 
     socket.on('fetchMessageHistory', async (room: string) => {
@@ -145,6 +147,12 @@ const main = async () => {
 
     socket.on('join', (room) => {
       // Leave room if already joined
+      if (socket.data.room) {
+        console.log('data room:' + socket.data.room);
+        console.log(`${socket.data.username} left room ${socket.data.room}`);
+        socket.leave(socket.data.room);
+      }
+
       socket.join(room);
       console.log(`${socket.data.username} joined room ${room}`);
       socket
@@ -173,9 +181,8 @@ const main = async () => {
           `User ${socket.data.username} has left the room.`
         );
     });
-
     socket.on('disconnect', () => {
-      console.log(`Client disconnected: ${socket.id}`);
+      console.log(`Client disconnected: ${socket.data.username}`);
     });
 
     io.emit('rooms', getRooms());
@@ -184,18 +191,15 @@ const main = async () => {
   function getRooms() {
     const { rooms } = io.sockets.adapter;
     const roomsFound: string[] = []; // Room[]
-
+    // Hämta sockets från setOfSocketIds och plocka ut socket.data....
     for (const [name, setOfSocketIds] of rooms) {
-      // Hämta sockets från setOfSocketIds och plocka ut socket.data....
       if (!setOfSocketIds.has(name)) {
-        if (name.includes('dm-')) continue;
         roomsFound.push(name);
       }
     }
 
     return roomsFound;
   }
-
   io.listen(3000);
   console.log('Connected and listening to port 3000');
 };

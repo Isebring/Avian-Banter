@@ -5,6 +5,8 @@ export interface ServerToClientEvents {
   messageHistory: (messages: Message[]) => void;
   session: (user: SocketData) => void;
   typing: (isTyping: boolean, user: User) => void;
+  users: (users: SocketData[]) => void;
+  roomCreated: (room: string) => void;
 }
 
 export interface ClientToServerEvents {
@@ -38,8 +40,8 @@ export interface User {
   username: string;
 }
 
-interface DM {
-  roomID: string; // generate random string
-  userID1: string;
-  userID2: string;
-}
+// interface DM {
+//   roomID: string; // generate random string
+//   userID1: string;
+//   userID2: string;
+// }

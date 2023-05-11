@@ -18,7 +18,9 @@ import {
   IconDoorEnter,
   IconMessageCircle,
 } from '@tabler/icons-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { SocketData } from '../../../server/communication';
+import { useSocket } from '../context/SocketContext';
 import { useUsername } from '../context/UsernameContext';
 
 const useStyles = createStyles((theme) => ({
@@ -87,6 +89,11 @@ export function Navigationbar() {
   const { classes, theme } = useStyles();
   const { username } = useUsername();
   const sessionID = localStorage.getItem('sessionID');
+  const { users, createDMRoom } = useSocket();
+  const navigate = useNavigate();
+
+  const currentUserID = localStorage.getItem('sessionID');
+  const filteredUsers = users.filter((user) => user.userID !== currentUserID);
 
   function scrollToTop() {
     window.scrollTo({
@@ -96,6 +103,15 @@ export function Navigationbar() {
     closeDrawer();
     closeMessagesDrawer();
   }
+
+  const handleCreateDMRoom = async (recipientUserID: string) => {
+    const room = await createDMRoom(recipientUserID);
+    if (room) {
+      navigate(`dm/${room}`);
+      closeMessagesDrawer();
+      closeDrawer();
+    }
+  };
 
   return (
     <Box sx={{ position: 'sticky', top: 0, left: 0, right: 0, zIndex: 1 }}>
@@ -186,18 +202,11 @@ export function Navigationbar() {
         className={classes.hiddenDesktop}
         zIndex={1000000}
       >
-        {/* <Link
-          onClick={scrollToTop}
-          style={{ textDecoration: 'none' }}
-          to="/profile"
-        ></Link> */}
-
         <ScrollArea h={`calc(100vh - ${rem(60)})`} mx="-md">
           <Divider
             my="lg"
             color={theme.colorScheme === 'dark' ? 'dark.5' : 'gray.1'}
           />
-
           <a href="/createroom" onClick={scrollToTop} className={classes.link}>
             <IconDoor
               style={{ marginRight: '0.2rem' }}
@@ -210,7 +219,6 @@ export function Navigationbar() {
             my="lg"
             color={theme.colorScheme === 'dark' ? 'dark.5' : 'gray.1'}
           />
-
           <a href="/joinroom" onClick={scrollToTop} className={classes.link}>
             <IconDoorEnter
               style={{ marginRight: '0.2rem' }}
@@ -235,7 +243,6 @@ export function Navigationbar() {
             />
             Messages
           </Button>
-
           <Divider
             my="lg"
             color={theme.colorScheme === 'dark' ? 'dark.5' : 'gray.1'}
@@ -249,14 +256,25 @@ export function Navigationbar() {
         opened={messagesDrawerOpened}
         onClose={closeMessagesDrawer}
         position="right"
-        size="40%"
+        size="40rem"
         padding="md"
         title="Messages"
         zIndex={1000000}
       >
-        <Divider />
+        <Divider mb="sm" />
+        {filteredUsers &&
+          filteredUsers.map((user: SocketData) => (
+            <div key={user.userID}>
+              <Text sx={{ marginBottom: '0.3rem' }} mt="xs">
+                {user.username}
+              </Text>
+              <Button onClick={() => handleCreateDMRoom(user.userID)}>
+                Send Direct Message
+              </Button>
 
-        {/* Add your messages-related content here */}
+              <Divider mt="md" />
+            </div>
+          ))}
       </Drawer>
     </Box>
   );
