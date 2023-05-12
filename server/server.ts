@@ -8,8 +8,8 @@ import {
   Message,
   ServerToClientEvents,
   SocketData,
-  User,
 } from './communication';
+import { storeUsername } from './controller';
 
 dotenv.config();
 
@@ -64,6 +64,7 @@ const main = async () => {
         socket.data.sessionID = session.sessionID;
         socket.data.userID = session.userID;
         socket.data.username = session.username;
+        socket.data.room = session.room;
         return next();
       }
     }
@@ -82,23 +83,32 @@ const main = async () => {
   io.on('connection', async (socket) => {
     console.log(`Client connected: ${socket.data.username}`);
     const users = await sessionsCollection.find({}).toArray();
-    io.emit('users', users);
-    console.log('Connected users:', users);
+
+    io.emit(
+      'users',
+      users.map((u) => ({ username: u.username, userID: u.userID }))
+    );
+    // console.log('Connected users:', users);
 
     socket.emit('systemMessage', 'Welcome to Avian Banter!');
 
     socket.emit('session', socket.data as SocketData);
 
-    socket.on('storeUsername', async (username: string) => {
-      socket.data.username = username;
+    if (socket.data.room) {
+      console.log('Rejoining room:', socket.data.room);
+      socket.join(socket.data.room);
+    }
 
-      console.log(`Username stored: ${username}`);
-    });
+    socket.on('storeUsername', storeUsername(socket));
 
-    socket.on('createRoom', (room: string) => {
+    socket.on('createRoom', async (room: string) => {
       if (!room || !socket.data.username) return;
       console.log(`Room created: ${room}`);
       socket.join(room);
+      await sessionsCollection.findOneAndUpdate(
+        { sessionID: socket.data.sessionID },
+        { $set: { room } }
+      );
       console.log(`${socket.data.username} joined room ${room}`);
       socket.emit('systemMessage', `You have joined the room.`);
       socket
@@ -134,18 +144,19 @@ const main = async () => {
       });
 
       socket.to(room).emit('message', message);
-      socket.emit('message', message);
+      // socket.emit('message', message);
     });
 
+    console.log('listen on typing...');
     socket.on('typing', (isTyping: boolean, room: string) => {
       console.log(`${socket.data.username} is typing in room ${room}`);
-      socket.broadcast.to(room).emit('typing', isTyping, {
+      socket.to(room).emit('typing', isTyping, {
         username: socket.data.username!,
         userID: socket.data.userID!,
       });
     });
 
-    socket.on('join', (room) => {
+    socket.on('join', async (room) => {
       // Leave room if already joined
       // if (socket.data.room) {
       //   console.log('data room:' + socket.data.room);
@@ -154,6 +165,10 @@ const main = async () => {
       // }
 
       socket.join(room);
+      await sessionsCollection.findOneAndUpdate(
+        { sessionID: socket.data.sessionID },
+        { $set: { room } }
+      );
       console.log(`${socket.data.username} joined room ${room}`);
       socket
         .to(room)
@@ -221,8 +236,3 @@ const main = async () => {
 };
 
 main();
-
-interface Room {
-  name: string;
-  users: User[];
-}
