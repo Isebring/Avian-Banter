@@ -5,7 +5,7 @@ export interface ServerToClientEvents {
   messageHistory: (messages: Message[]) => void;
   session: (user: SocketData) => void;
   typing: (isTyping: boolean, user: User) => void;
-  users: (users: SocketData[]) => void;
+  users: (users: User[]) => void;
   roomCreated: (room: string) => void;
 }
 
