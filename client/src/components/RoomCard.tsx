@@ -1,6 +1,5 @@
 import { Button, Card, Text, Title } from '@mantine/core';
 import { IconMessageChatbot } from '@tabler/icons-react';
-import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSocket } from '../context/SocketContext';
 
@@ -10,20 +9,12 @@ interface RoomCardProps {
 
 function RoomCard({ roomName }: RoomCardProps) {
   const navigate = useNavigate();
-  const { join, leave } = useSocket();
+  const { join } = useSocket();
 
   const handleJoin = () => {
     join(roomName);
     navigate(`/room/${roomName}`);
   };
-
-  const handleLeave = () => {
-    leave(roomName);
-  };
-
-  useEffect(() => {
-    return handleLeave;
-  }, [roomName]);
 
   return (
     <Card

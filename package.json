@@ -4,6 +4,7 @@
   "description": "A chat application built with Socket.io and React.",
   "main": "index.js",
   "scripts": {
+    "setup": "npm install && cd server && npm install && cd ../client && npm install && cd ..",
     "server": "cd server && npm run dev",
     "client": "cd client && npm run dev",
     "dev": "concurrently \"npm run server\" \"npm run client\""
