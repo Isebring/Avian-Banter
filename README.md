@@ -27,3 +27,11 @@ Krav för väl godkänt:
 - [x] När sidan laddas om ska användaren behålla sitt användarnamn, läggas tillbaka i
       konversationen som den befann sig i (Rum eller DM) och kunna sina läsa tidigare
       DM’s.
+
+## For developers
+
+To get started, clone the repository and run `npm run setup`. This will install all dependencies and start the server and client.
+
+Once all dependencies have been installed, you can alternatively run `npm run dev` to start the server and client.
+
+If you want to start only the server or client, you can use `npm run server` or `npm run client` respectively.
