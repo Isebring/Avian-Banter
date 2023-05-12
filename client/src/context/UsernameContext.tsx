@@ -29,7 +29,6 @@ export const UsernameProvider: React.FC<UsernameProviderProps> = ({
     localStorage.getItem('username') || ''
   );
   const [userID, setUserID] = useState('');
-  console.log('username:', username);
   useEffect(() => {
     const sessionID = localStorage.getItem('sessionID');
 

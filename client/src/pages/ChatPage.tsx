@@ -37,7 +37,6 @@ function ChatPage() {
 
   useEffect(() => {
     const handleTyping = (isTyping: boolean, user: User) => {
-      console.log('HElllooooo');
       if (isTyping) {
         setTypingUsers((users) => [...users, user]);
       } else {
@@ -46,7 +45,6 @@ function ChatPage() {
         );
       }
     };
-    console.log('Setup typing..');
     socket.on('typing', handleTyping);
     return () => {
       socket.off('typing', handleTyping);

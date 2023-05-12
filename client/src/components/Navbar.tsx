@@ -19,7 +19,7 @@ import {
   IconMessageCircle,
 } from '@tabler/icons-react';
 import { Link, useNavigate } from 'react-router-dom';
-import { SocketData } from '../../../server/communication';
+import { User } from '../../../server/communication';
 import { useSocket } from '../context/SocketContext';
 import { useUsername } from '../context/UsernameContext';
 
@@ -263,7 +263,7 @@ export function Navigationbar() {
       >
         <Divider mb="sm" />
         {filteredUsers &&
-          filteredUsers.map((user: SocketData) => (
+          filteredUsers.map((user: User) => (
             <div key={user.userID}>
               <Text sx={{ marginBottom: '0.3rem' }} mt="xs">
                 {user.username}
