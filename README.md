@@ -1,6 +1,14 @@
 # Avian-Banter
 
-A chat application built with Socket.io and React.
+A chat application built with Socket.IO and React. In this application you can enter a username, create or join a room, and chat with other users in rooms.
+
+We have used the following tools in this project:
+
+- React
+- Socket.IO
+- Mantine
+- TypeScript
+- MongoDB
 
 Krav för godkänt:
 
@@ -30,8 +38,14 @@ Krav för väl godkänt:
 
 ## For developers
 
-To get started, clone the repository and run `npm run setup`. This will install all dependencies and start the server and client.
+To get started, clone the repository and run `npm run setup`. This will install all dependencies.
 
-Once all dependencies have been installed, you can alternatively run `npm run dev` to start the server and client.
+Once all dependencies have been installed, you can alternatively run `npm run dev` to start the server and client in the same terminal.
 
-If you want to start only the server or client, you can use `npm run server` or `npm run client` respectively.
+If you want to start the server or client in separate terminals, you can use `npm run server` or `npm run client` respectively.
+
+### The Team
+
+- [Emil Helgesson](https://github.com/Emil-Helge)
+- [Gabriel Lugo Méndez](https://github.com/gabriel-lugo)
+- [Hampus Isebring](https://github.com/Isebring)
