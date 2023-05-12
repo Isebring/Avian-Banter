@@ -10,7 +10,7 @@ import {
   ClientToServerEvents,
   Message,
   ServerToClientEvents,
-  SocketData,
+  User,
 } from '../../../server/communication';
 
 interface ContextValues {
@@ -22,7 +22,7 @@ interface ContextValues {
   join: (room: string) => void;
   leave: (room: string) => void;
   fetchMessageHistory: (room: string) => void;
-  users: SocketData[];
+  users: User[];
   createDMRoom: (recipientUserID: string) => Promise<string | null>;
 }
 
@@ -37,7 +37,7 @@ export const useSocket = () => useContext(SocketContext);
 function SocketProvider({ children }: PropsWithChildren) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [rooms, setRooms] = useState<string[]>([]);
-  const [users, setUsers] = useState<SocketData[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
 
   const storeUsername = (username: string) => {
     socket.auth = { username };
@@ -105,7 +105,7 @@ function SocketProvider({ children }: PropsWithChildren) {
   }, [socket]);
 
   useEffect(() => {
-    const onUsersUpdate = (users: SocketData[]) => {
+    const onUsersUpdate = (users: User[]) => {
       setUsers(users);
       console.log('socketContext users:', users);
     };
